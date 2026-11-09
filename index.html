@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0B7A55">
+<title>Hospiswift – Pharmacy & Hospital App</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --green:#0B7A55; --green-d:#085C41; --green-l:#E3F4EC;
+  --blue:#1565C0; --blue-d:#0D47A1; --blue-l:#E4EEFB;
+  --red:#D32F2F; --red-l:#FDE8E8;
+  --ink:#10231C; --mute:#5D6F68; --line:#DCE6E1; --bg:#F5F9F7; --card:#fff;
+  --accent:var(--green); --accent-d:var(--green-d); --accent-l:var(--green-l);
+}
+body.hosp{--accent:var(--blue); --accent-d:var(--blue-d); --accent-l:var(--blue-l); --bg:#F4F8FD; --line:#D9E4F2}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{font-family:Figtree,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--ink);
+  max-width:480px;margin:0 auto;position:relative;transition:background .3s;padding-top:env(safe-area-inset-top,0px)}
+button{font:inherit;cursor:pointer;border:0;background:none;color:inherit}
+input{font:inherit}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+header{position:sticky;top:0;z-index:20;background:var(--accent);color:#fff;padding:14px 16px 16px;transition:background .3s;
+  border-radius:0 0 22px 22px}
+.top{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.brand{font-weight:800;font-size:20px;letter-spacing:-.3px;display:flex;align-items:center;gap:8px}
+.brand svg{width:26px;height:26px}
+.loc{font-size:13px;background:rgba(255,255,255,.18);padding:6px 10px;border-radius:99px;display:flex;gap:6px;align-items:center}
+.sos{background:var(--red);color:#fff;font-weight:800;padding:8px 14px;border-radius:99px;font-size:14px;box-shadow:0 0 0 3px rgba(255,255,255,.35)}
+.search{margin-top:12px;display:flex;align-items:center;gap:8px;background:#fff;border-radius:14px;padding:0 12px}
+.search input{flex:1;border:0;padding:13px 0;outline:0;color:var(--ink);background:none;min-width:0}
+.search svg{width:20px;height:20px;color:var(--mute);flex:none}
+main{padding:16px 16px 120px}
+h2{font-size:17px;font-weight:800;margin:18px 0 10px}
+.view{display:none}.view.on{display:block}
+.chips{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none}
+.chip{flex:none;padding:8px 14px;border-radius:99px;background:#fff;border:1.5px solid var(--line);font-weight:600;font-size:14px}
+.chip.on{background:var(--accent);border-color:var(--accent);color:#fff}
+.card{background:var(--card);border:1.5px solid var(--line);border-radius:16px;padding:14px;margin-bottom:12px}
+.row{display:flex;gap:12px;align-items:center}
+.grow{flex:1;min-width:0}
+.ico{width:46px;height:46px;border-radius:12px;background:var(--accent-l);color:var(--accent);display:grid;place-items:center;flex:none}
+.ico svg{width:24px;height:24px}
+.t{font-weight:700}.s{font-size:13px;color:var(--mute)}
+.tag{display:inline-block;font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;background:var(--accent-l);color:var(--accent-d)}
+.tag.rx{background:#FFF1DC;color:#9A5B00}.tag.red{background:var(--red-l);color:var(--red)}
+.btn{background:var(--accent);color:#fff;font-weight:700;padding:11px 16px;border-radius:12px;display:inline-block}
+.btn.out{background:#fff;color:var(--accent);border:1.5px solid var(--accent)}
+.btn.full{width:100%;text-align:center;padding:14px}
+.btn.sm{padding:7px 12px;font-size:14px}
+.btn.red{background:var(--red)}
+.btn:disabled{opacity:.45}
+.price{font-weight:800}
+.hero{background:var(--accent-l);border-radius:18px;padding:16px;display:flex;gap:12px;align-items:center;margin-bottom:6px}
+.hero b{font-size:17px}.hero p{font-size:13px;color:var(--mute);margin-top:2px}
+.upload{border:2px dashed var(--accent);border-radius:14px;padding:14px;text-align:center;color:var(--accent-d);font-weight:700;display:block;cursor:pointer;background:#fff}
+.upload input{display:none}
+.emerg{background:var(--red);color:#fff;border-radius:18px;padding:16px;margin-bottom:14px}
+.emerg h3{font-size:18px}.emerg p{font-size:13px;opacity:.9;margin:4px 0 12px}
+.emerg .g{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.emerg a,.emerg button{background:#fff;color:var(--red);font-weight:800;text-align:center;padding:12px;border-radius:12px;text-decoration:none;font-size:15px}
+nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;background:#fff;border-top:1.5px solid var(--line);
+  display:flex;padding:6px 6px calc(6px + env(safe-area-inset-bottom,0px));z-index:30}
+nav button{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:12px;font-weight:600;color:var(--mute);padding:6px 0;position:relative}
+nav button svg{width:24px;height:24px}
+nav button.on{color:var(--accent)}
+nav .badge{position:absolute;top:0;right:28%;background:var(--red);color:#fff;font-size:11px;border-radius:99px;min-width:18px;padding:0 5px;line-height:18px}
+.cartbar{position:fixed;bottom:calc(68px + env(safe-area-inset-bottom,0px));left:50%;transform:translateX(-50%);width:calc(100% - 28px);max-width:452px;
+  background:var(--green);color:#fff;border-radius:14px;padding:13px 16px;display:none;justify-content:space-between;font-weight:700;z-index:25;box-shadow:0 6px 18px rgba(0,0,0,.2)}
+.cartbar.on{display:flex}
+.sheet-bg{position:fixed;inset:0;background:rgba(10,25,20,.5);z-index:40;display:none}
+.sheet-bg.on{display:block}
+.sheet{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;max-height:88vh;overflow:auto;background:var(--bg);
+  border-radius:22px 22px 0 0;padding:18px 16px calc(20px + env(safe-area-inset-bottom,0px));z-index:50;display:none}
+.sheet.on{display:block}
+.sheet h3{font-size:19px;margin-bottom:12px}
+.qty{display:flex;align-items:center;gap:10px}
+.qty button{width:30px;height:30px;border-radius:9px;background:var(--accent-l);color:var(--accent-d);font-weight:800;font-size:18px}
+.sum div{display:flex;justify-content:space-between;padding:5px 0;font-size:14px}
+.sum .tot{font-weight:800;font-size:17px;border-top:1.5px solid var(--line);margin-top:6px;padding-top:10px}
+.steps{list-style:none;margin:12px 0}
+.steps li{padding:8px 0 8px 30px;position:relative;color:var(--mute);font-size:14px}
+.steps li:before{content:"";position:absolute;left:4px;top:11px;width:14px;height:14px;border-radius:50%;border:2px solid var(--line);background:#fff}
+.steps li.done{color:var(--ink);font-weight:600}
+.steps li.done:before{background:var(--green);border-color:var(--green)}
+.steps li.now:before{border-color:var(--green);box-shadow:0 0 0 4px var(--green-l)}
+.otp{font-size:26px;font-weight:800;letter-spacing:6px;color:var(--green-d);background:var(--green-l);border-radius:12px;text-align:center;padding:8px}
+.slots{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0 14px}
+.slots button{padding:10px 0;border-radius:10px;border:1.5px solid var(--line);background:#fff;font-weight:700;font-size:14px}
+.slots button.on{background:var(--blue);border-color:var(--blue);color:#fff}
+.toast{position:fixed;top:14px;left:50%;transform:translateX(-50%) translateY(-90px);background:var(--ink);color:#fff;padding:11px 18px;border-radius:12px;font-weight:600;font-size:14px;z-index:99;transition:transform .3s;max-width:90%;text-align:center}
+.toast.on{transform:translateX(-50%) translateY(0)}
+.empty{text-align:center;color:var(--mute);padding:40px 10px}
+.note{font-size:12px;color:var(--mute);text-align:center;margin-top:16px}
+.room{background:#0F2A22;border-radius:18px;padding:24px 16px;text-align:center;position:relative;min-height:260px;display:flex;flex-direction:column;align-items:center;gap:6px;margin-bottom:12px}
+.room .av{width:84px;height:84px;border-radius:50%;background:var(--accent);color:#fff;font-weight:800;font-size:28px;display:grid;place-items:center;margin-bottom:6px}
+.room .tmr{color:#fff;font-weight:800;font-size:22px;margin-top:6px}
+.me{position:absolute;right:10px;bottom:10px;width:90px;height:120px;object-fit:cover;border-radius:12px;background:#000;transform:scaleX(-1)}
+.ctl{display:flex;gap:8px}.ctl .btn{flex:1;padding:12px;margin:0}
+.msgs{background:#fff;border:1.5px solid var(--line);border-radius:14px;height:240px;overflow:auto;padding:10px;margin-bottom:10px;display:flex;flex-direction:column;gap:8px}
+.bub{max-width:80%;padding:8px 12px;border-radius:14px;font-size:14px}.bub.d{background:var(--accent-l);align-self:flex-start}.bub.u{background:var(--accent);color:#fff;align-self:flex-end}
+.slots button.on{background:var(--accent);border-color:var(--accent)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="top">
+    <div class="brand">
+      <svg viewBox="0 0 32 32" fill="none"><rect x="2" y="2" width="28" height="28" rx="8" fill="#fff"/><path d="M13 8h6v5h5v6h-5v5h-6v-5H8v-6h5z" fill="currentColor" id="logoCross"/></svg>
+      Hospiswift
+    </div>
+    <div class="loc" id="loc" role="button" tabindex="0">📍 <span id="locTxt">Lagos – Ikeja</span></div>
+    <button class="sos" id="sosTop" aria-label="Emergency">SOS</button>
+  </div>
+  <div class="search" id="searchWrap">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+    <input id="q" type="search" placeholder="Search drugs or pharmacies" aria-label="Search">
+  </div>
+</header>
+
+<main>
+  <!-- PHARMACY -->
+  <section class="view on" id="v-pharm">
+    <div class="hero">
+      <div class="ico" style="background:#fff"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="9" width="18" height="6" rx="3" transform="rotate(-35 12 12)"/><path d="m9 9 6 6"/></svg></div>
+      <div><b>Medicine in 30–60 min</b><p>Verified pharmacies near you. Rider brings it to your door.</p></div>
+    </div>
+    <h2>Have a prescription?</h2>
+    <label class="upload"><input type="file" id="rxFile" accept="image/*,.pdf">📄 Upload prescription<div class="s" id="rxName" style="font-weight:500">A pharmacist will verify it before dispatch</div></label>
+    <h2>Categories</h2>
+    <div class="chips" id="cats"></div>
+    <h2>Medicines</h2>
+    <div id="drugs"></div>
+    <h2>Pharmacies near you</h2>
+    <div id="pharms"></div>
+  </section>
+
+  <!-- HOSPITAL -->
+  <section class="view" id="v-hosp">
+    <div class="emerg">
+      <h3>Emergency?</h3>
+      <p>Call first. The app is a helper, not a replacement for a direct call.</p>
+      <div class="g">
+        <a href="tel:112">📞 Call 112</a>
+        <button id="shareLoc">📍 Share location</button>
+      </div>
+    </div>
+    <div class="chips" id="hfilters"></div>
+    <h2>Hospitals near you</h2>
+    <div id="hosps"></div>
+  </section>
+
+  <!-- ORDERS -->
+  <section class="view" id="v-orders">
+    <h2 style="margin-top:4px">Your orders & bookings</h2>
+    <div id="orders"></div>
+  </section>
+
+  <p class="note">Demo prototype. Not a medical service. In an emergency call 112. <a href="partners.html" style="color:inherit;font-weight:700">Own a pharmacy or hospital? Partner with us</a></p>
+</main>
+
+<div class="cartbar" id="cartbar" role="button" tabindex="0"><span id="cbCount"></span><span id="cbTotal"></span></div>
+
+<nav>
+  <button data-v="pharm" class="on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="9" width="18" height="6" rx="3" transform="rotate(-35 12 12)"/><path d="m9 9 6 6"/></svg>Pharmacy</button>
+  <button data-v="hosp"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 21V5a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v16M2 21h20M12 8v6M9 11h6"/></svg>Hospitals</button>
+  <button data-v="orders"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2h12v20l-3-2-3 2-3-2-3 2zM9 8h6M9 12h6"/></svg>Orders<span class="badge" id="obadge" hidden>0</span></button>
+</nav>
+
+<div class="sheet-bg" id="bg"></div>
+<div class="sheet" id="sheet"></div>
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+"use strict";
+var $=function(s){return document.querySelector(s)};
+var naira=function(n){return "₦"+Math.round(n).toLocaleString("en-NG")};
+
+/* ---------- DATA ---------- */
+var PHARMS=[
+  {id:1,name:"HealthPlus Pharmacy",km:1.2,eta:25,rating:4.8,open:"24 hrs"},
+  {id:2,name:"MedPoint Pharmacy",km:2.4,eta:35,rating:4.6,open:"8am – 10pm"},
+  {id:3,name:"Alpha Care Chemist",km:3.1,eta:40,rating:4.5,open:"24 hrs"},
+  {id:4,name:"GreenCross Pharmacy",km:4.0,eta:50,rating:4.3,open:"7am – 9pm"}
+];
+var DRUGS=[
+  {id:1,name:"Paracetamol 500mg",cat:"Pain & fever",pack:"Pack of 20",price:600,rx:false},
+  {id:2,name:"Ibuprofen 400mg",cat:"Pain & fever",pack:"Pack of 10",price:900,rx:false},
+  {id:3,name:"Vitamin C 1000mg",cat:"Vitamins",pack:"Tube of 10",price:1800,rx:false},
+  {id:4,name:"ORS Sachets",cat:"Stomach",pack:"Box of 5",price:1200,rx:false},
+  {id:5,name:"Loratadine 10mg",cat:"Allergy",pack:"Pack of 10",price:1500,rx:false},
+  {id:6,name:"Amoxicillin 500mg",cat:"Antibiotics",pack:"Pack of 21",price:3500,rx:true},
+  {id:7,name:"Metformin 500mg",cat:"Chronic care",pack:"Pack of 30",price:2800,rx:true},
+  {id:8,name:"Amlodipine 5mg",cat:"Chronic care",pack:"Pack of 30",price:3200,rx:true},
+  {id:9,name:"Artemether/Lumefantrine",cat:"Malaria",pack:"Adult course",price:2500,rx:false}
+];
+var HOSPS=[
+  {id:1,name:"Lagoon General Hospital",km:1.8,type:"General",open24:true,rating:4.6,phone:"+2348000000001",docs:["Dr. Adeyemi – GP","Dr. Okafor – Paediatrics"]},
+  {id:2,name:"St. Mary Specialist Hospital",km:3.2,type:"Specialist",open24:true,rating:4.7,phone:"+2348000000002",docs:["Dr. Bello – Cardiology","Dr. Eze – Surgery"]},
+  {id:3,name:"Bright Future Maternity Centre",km:4.5,type:"Maternity",open24:false,rating:4.4,phone:"+2348000000003",docs:["Dr. Ibrahim – Obstetrics","Dr. Nwosu – Midwifery"]},
+  {id:4,name:"CityCare Clinic",km:2.1,type:"Clinic",open24:false,rating:4.2,phone:"+2348000000004",docs:["Dr. Balogun – GP","Dr. Musa – Dental"]}
+];
+var STAGES=["Pharmacist verifying order","Pharmacy preparing items","Rider assigned","Rider on the way","Delivered"];
+var CF={
+ h1:{"Video":8000,"Voice":6000,"Chat":4000,"In person":10000,"Emergency":15000,"Follow-up":5000},
+ h2:{"Video":12000,"Voice":9000,"Chat":6000,"In person":15000,"Emergency":25000,"Follow-up":8000},
+ h3:{"Video":7000,"Voice":5000,"Chat":3000,"In person":9000,"Emergency":15000,"Follow-up":4500},
+ h4:{"Video":5000,"Voice":4000,"Chat":2500,"In person":6000,"Emergency":10000,"Follow-up":3000},
+ p1:{"Video":2000,"Voice":1500,"Chat":1000},p2:{"Video":1800,"Voice":1200,"Chat":800},
+ p3:{"Video":2500,"Voice":1800,"Chat":1000},p4:{"Video":1500,"Voice":1000,"Chat":700}
+};
+
+
+/* ---------- STATE ---------- */
+var S={cat:"All",hf:"All",q:"",cart:{},pharm:1,orders:[],rx:null};
+try{var saved=JSON.parse(localStorage.getItem("hospiswift")||"null");if(saved&&saved.orders)S.orders=saved.orders}catch(e){}
+function persist(){try{localStorage.setItem("hospiswift",JSON.stringify({orders:S.orders}))}catch(e){}}
+
+/* ---------- UTIL ---------- */
+function toast(m){var t=$("#toast");t.textContent=m;t.classList.add("on");clearTimeout(toast.t);toast.t=setTimeout(function(){t.classList.remove("on")},2600)}
+function openSheet(html){$("#sheet").innerHTML=html;$("#sheet").classList.add("on");$("#bg").classList.add("on")}
+var onClose=null;
+function closeSheet(){if(onClose){onClose();onClose=null}$("#sheet").classList.remove("on");$("#bg").classList.remove("on")}
+$("#bg").onclick=closeSheet;
+function cartItems(){return Object.keys(S.cart).map(function(id){var d=DRUGS.filter(function(x){return x.id==id})[0];return {d:d,n:S.cart[id]}})}
+function cartSub(){return cartItems().reduce(function(a,i){return a+i.d.price*i.n},0)}
+function cartCount(){return cartItems().reduce(function(a,i){return a+i.n},0)}
+function needsRx(){return cartItems().some(function(i){return i.d.rx})}
+function pharm(){return PHARMS.filter(function(p){return p.id==S.pharm})[0]}
+function fee(){return 500+Math.round(pharm().km*150)}
+
+/* ---------- NAV ---------- */
+function show(v){
+  document.querySelectorAll(".view").forEach(function(e){e.classList.remove("on")});
+  $("#v-"+v).classList.add("on");
+  document.querySelectorAll("nav button").forEach(function(b){b.classList.toggle("on",b.dataset.v===v)});
+  document.body.classList.toggle("hosp",v==="hosp");
+  document.querySelector('meta[name="theme-color"]').content=v==="hosp"?"#1565C0":"#0B7A55";
+  $("#searchWrap").style.display=v==="orders"?"none":"flex";
+  $("#q").placeholder=v==="hosp"?"Search hospitals or doctors":"Search drugs or pharmacies";
+  $("#q").value="";S.q="";
+  if(v==="hosp")renderHosp();else if(v==="pharm")renderPharm();else renderOrders();
+  updateCartBar();window.scrollTo(0,0);
+}
+document.querySelectorAll("nav button").forEach(function(b){b.onclick=function(){show(b.dataset.v)}});
+$("#sosTop").onclick=function(){show("hosp");toast("Call 112 or share your location")};
+$("#q").oninput=function(e){S.q=e.target.value.toLowerCase();var on=document.querySelector(".view.on").id;if(on==="v-hosp")renderHosp();else renderPharm()};
+
+/* ---------- PHARMACY ---------- */
+function renderPharm(){
+  var cats=["All"].concat(DRUGS.map(function(d){return d.cat}).filter(function(c,i,a){return a.indexOf(c)===i}));
+  $("#cats").innerHTML=cats.map(function(c){return '<button class="chip'+(c===S.cat?' on':'')+'" data-c="'+c+'">'+c+'</button>'}).join("");
+  document.querySelectorAll("#cats .chip").forEach(function(b){b.onclick=function(){S.cat=b.dataset.c;renderPharm()}});
+  var list=DRUGS.filter(function(d){return (S.cat==="All"||d.cat===S.cat)&&(!S.q||d.name.toLowerCase().indexOf(S.q)>-1)});
+  $("#drugs").innerHTML=list.length?list.map(function(d){
+    var n=S.cart[d.id]||0;
+    return '<div class="card row"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="9" width="18" height="6" rx="3" transform="rotate(-35 12 12)"/><path d="m9 9 6 6"/></svg></div>'+
+    '<div class="grow"><div class="t">'+d.name+'</div><div class="s">'+d.pack+'</div><div style="margin-top:4px"><span class="price">'+naira(d.price)+'</span> '+(d.rx?'<span class="tag rx">Prescription</span>':'<span class="tag">No prescription</span>')+'</div></div>'+
+    (n?'<div class="qty"><button data-m="'+d.id+'" aria-label="Remove one">−</button><b>'+n+'</b><button data-p="'+d.id+'" aria-label="Add one">+</button></div>':'<button class="btn sm" data-p="'+d.id+'">Add</button>')+'</div>'
+  }).join(""):'<div class="empty">No medicine found. Try another name or upload your prescription.</div>';
+  document.querySelectorAll("#drugs [data-p]").forEach(function(b){b.onclick=function(){S.cart[b.dataset.p]=(S.cart[b.dataset.p]||0)+1;renderPharm();updateCartBar()}});
+  document.querySelectorAll("#drugs [data-m]").forEach(function(b){b.onclick=function(){var id=b.dataset.m;S.cart[id]--;if(S.cart[id]<=0)delete S.cart[id];renderPharm();updateCartBar()}});
+  var ps=PHARMS.filter(function(p){return !S.q||p.name.toLowerCase().indexOf(S.q)>-1});
+  $("#pharms").innerHTML=ps.map(function(p){
+    return '<div class="card row" style="'+(p.id===S.pharm?'border-color:var(--green)':'')+'"><div class="ico"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 3h4v7h7v4h-7v7h-4v-7H3v-4h7z"/></svg></div>'+
+    '<div class="grow"><div class="t">'+p.name+'</div><div class="s">'+p.km+' km · '+p.eta+' min · ★ '+p.rating+'</div><div class="s">Open: '+p.open+'</div></div>'+
+    '<div style="display:grid;gap:6px"><button class="btn sm'+(p.id===S.pharm?'':' out')+'" data-ph="'+p.id+'">'+(p.id===S.pharm?'Selected':'Choose')+'</button><button class="btn sm out" data-pc="'+p.id+'">Consult</button></div></div>'
+  }).join("");
+  document.querySelectorAll("[data-ph]").forEach(function(b){b.onclick=function(){S.pharm=+b.dataset.ph;renderPharm();updateCartBar();toast(pharm().name+" selected")}});
+}
+document.querySelectorAll("[data-pc]").forEach(function(b){b.onclick=function(){openBook("p",+b.dataset.pc)}});
+$("#rxFile").onchange=function(e){var f=e.target.files[0];if(f){S.rx=f.name;$("#rxName").textContent="✔ "+f.name+" attached";toast("Prescription attached")}};
+function updateCartBar(){
+  var c=cartCount(),on=c>0&&$("#v-pharm").classList.contains("on");
+  $("#cartbar").classList.toggle("on",on);
+  $("#cbCount").textContent="View cart · "+c+" item"+(c>1?"s":"");
+  $("#cbTotal").textContent=naira(cartSub());
+}
+$("#cartbar").onclick=openCart;
+
+function openCart(){
+  var items=cartItems();if(!items.length)return;
+  var sub=cartSub(),f=fee(),svc=Math.round(sub*0.05),tot=sub+f+svc,rx=needsRx();
+  openSheet('<h3>Your cart</h3><div class="s" style="margin-bottom:10px">From <b>'+pharm().name+'</b></div>'+
+    items.map(function(i){return '<div class="card row"><div class="grow"><div class="t">'+i.d.name+'</div><div class="s">'+i.n+' × '+naira(i.d.price)+'</div></div><b>'+naira(i.n*i.d.price)+'</b></div>'}).join("")+
+    (rx?'<div class="card" style="background:#FFF8EC;border-color:#F0D9A8"><div class="t">Prescription required</div><div class="s">'+(S.rx?'✔ '+S.rx+' attached. The pharmacist will verify it.':'Go back and upload your prescription to continue.')+'</div></div>':'')+
+    '<div class="card sum"><div><span>Subtotal</span><span>'+naira(sub)+'</span></div><div><span>Delivery ('+pharm().km+' km)</span><span>'+naira(f)+'</span></div><div><span>Service fee</span><span>'+naira(svc)+'</span></div><div class="tot"><span>Total</span><span>'+naira(tot)+'</span></div></div>'+
+    '<div class="card"><div class="t">Pay with</div><div class="chips" style="margin-top:8px" id="pay"><button class="chip on">Card</button><button class="chip">Bank transfer</button><button class="chip">USSD</button></div></div>'+
+    '<button class="btn full" id="place"'+(rx&&!S.rx?' disabled':'')+'>Pay '+naira(tot)+'</button>');
+  document.querySelectorAll("#pay .chip").forEach(function(b){b.onclick=function(){document.querySelectorAll("#pay .chip").forEach(function(x){x.classList.remove("on")});b.classList.add("on")}});
+  $("#place").onclick=function(){placeOrder(tot)};
+}
+function placeOrder(total){
+  var o={id:"HS"+Math.floor(1000+Math.random()*9000),type:"order",ph:pharm().name,items:cartItems().map(function(i){return i.n+"× "+i.d.name}),total:total,stage:0,otp:String(Math.floor(1000+Math.random()*9000)),rider:["Tunde A.","Chidi O.","Musa I.","Sade B."][Math.floor(Math.random()*4)]};
+  S.orders.unshift(o);S.cart={};S.rx=null;$("#rxName").textContent="A pharmacist will verify it before dispatch";
+  persist();closeSheet();toast("Order placed. Pharmacy notified");show("orders");advance(o);
+}
+function advance(o){
+  if(o.stage>=STAGES.length-1)return;
+  setTimeout(function(){o.stage++;persist();if($("#v-orders").classList.contains("on"))renderOrders();if(o.stage===STAGES.length-1)toast("Order "+o.id+" delivered");advance(o)},5000);
+}
+
+/* ---------- HOSPITALS ---------- */
+function renderHosp(){
+  var f=["All","24/7","General","Specialist","Maternity","Clinic"];
+  $("#hfilters").innerHTML=f.map(function(c){return '<button class="chip'+(c===S.hf?' on':'')+'" data-f="'+c+'">'+c+'</button>'}).join("");
+  document.querySelectorAll("#hfilters .chip").forEach(function(b){b.onclick=function(){S.hf=b.dataset.f;renderHosp()}});
+  var list=HOSPS.filter(function(h){
+    var okF=S.hf==="All"||(S.hf==="24/7"?h.open24:h.type===S.hf);
+    var okQ=!S.q||(h.name+h.docs.join(" ")).toLowerCase().indexOf(S.q)>-1;
+    return okF&&okQ}).sort(function(a,b){return a.km-b.km});
+  $("#hosps").innerHTML=list.length?list.map(function(h){
+    return '<div class="card"><div class="row"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 21V5a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v16M2 21h20M12 8v6M9 11h6"/></svg></div>'+
+    '<div class="grow"><div class="t">'+h.name+'</div><div class="s">'+h.km+' km · ★ '+h.rating+' · '+h.type+'</div><div style="margin-top:4px">'+(h.open24?'<span class="tag">Open 24/7</span>':'<span class="tag red">Day hours</span>')+'</div></div></div>'+
+    '<div class="row" style="margin-top:12px"><a class="btn sm full" style="text-decoration:none;flex:1" href="tel:'+h.phone+'">📞 Call</a><button class="btn sm out" style="flex:1;padding:10px" data-b="'+h.id+'">Book and pay</button></div></div>'
+  }).join(""):'<div class="empty">No hospital matches. Clear the filter or search.</div>';
+  document.querySelectorAll("[data-b]").forEach(function(b){b.onclick=function(){openBook("h",+b.dataset.b)}});
+}
+$("#shareLoc").onclick=function(){
+  if(!navigator.geolocation){toast("Location is not available on this device");return}
+  navigator.geolocation.getCurrentPosition(function(p){
+    var url="https://maps.google.com/?q="+p.coords.latitude+","+p.coords.longitude;
+    var msg="I need help. My location: "+url;
+    if(navigator.share){navigator.share({text:msg}).catch(function(){})}
+    else{try{navigator.clipboard.writeText(msg);toast("Location link copied. Send it to a contact")}catch(e){toast(msg)}}
+  },function(){toast("Allow location access to share where you are")},{timeout:8000});
+};
+function openBook(kind,id){
+  var e=(kind==="h"?HOSPS:PHARMS).filter(function(x){return x.id===id})[0];
+  var fees=CF[kind+id],modes=Object.keys(fees);
+  var pros=kind==="h"?e.docs:["Pharm. A. Obi","Pharm. K. Yusuf"];
+  var times=["9:00 AM","10:30 AM","12:00 PM","2:00 PM","4:00 PM","6:00 PM"];
+  var st={doc:pros[0],mode:modes[0],slot:null},col=kind==="h"?"var(--blue)":"var(--green)";
+  function draw(){
+    openSheet('<h3 style="color:'+col+'">'+(kind==="h"?"Book an appointment":"Talk to a pharmacist")+'</h3><div class="s" style="margin-bottom:10px">'+e.name+' sets its own fees</div>'+
+    '<div class="t">With</div><div class="chips" id="pp" style="margin:8px 0 12px">'+pros.map(function(d){return '<button class="chip'+(d===st.doc?' on':'')+'" data-p="'+d+'">'+d+'</button>'}).join("")+'</div>'+
+    '<div class="t">Appointment type</div><div class="chips" id="mm" style="margin:8px 0 12px">'+modes.map(function(m){return '<button class="chip'+(m===st.mode?' on':'')+'" data-m="'+m+'">'+m+' · '+naira(fees[m])+'</button>'}).join("")+'</div>'+
+    (st.mode==="Emergency"?'<div class="card" style="background:var(--red-l);border-color:var(--red)"><div class="t" style="color:var(--red)">Life-threatening? Call 112 now.</div><div class="s">Do not wait for a booking.</div></div>':'')+
+    '<div class="t">Today</div><div class="slots" id="sl">'+times.map(function(t){return '<button data-t="'+t+'"'+(t===st.slot?' class="on"':'')+'>'+t+'</button>'}).join("")+'</div>'+
+    '<button class="btn full" id="go" style="background:'+col+'"'+(st.slot?'':' disabled')+'>Pay '+naira(fees[st.mode])+' to book</button>');
+    document.querySelectorAll("#pp .chip").forEach(function(b){b.onclick=function(){st.doc=b.dataset.p;draw()}});
+    document.querySelectorAll("#mm .chip").forEach(function(b){b.onclick=function(){st.mode=b.dataset.m;draw()}});
+    document.querySelectorAll("#sl button").forEach(function(b){b.onclick=function(){st.slot=b.dataset.t;draw()}});
+    $("#go").onclick=pay;
+  }
+  function pay(){
+    var fee=fees[st.mode];
+    openSheet('<h3>Confirm and pay</h3><div class="card sum"><div><span>'+e.name+'</span><span></span></div><div><span>'+st.doc+'</span><span>'+st.mode+'</span></div><div><span>Today</span><span>'+st.slot+'</span></div><div class="tot"><span>Consultation fee</span><span>'+naira(fee)+'</span></div></div>'+
+    '<div class="card"><div class="t">Pay with</div><div class="chips" style="margin-top:8px" id="pm"><button class="chip on">Card</button><button class="chip">Bank transfer</button><button class="chip">USSD</button></div></div>'+
+    '<button class="btn full" id="pay" style="background:'+col+'">Pay '+naira(fee)+'</button><button class="btn out full" id="bk" style="margin-top:8px">Back</button><div class="note">You pay before the booking is confirmed. Demo only, no real charge.</div>');
+    document.querySelectorAll("#pm .chip").forEach(function(b){b.onclick=function(){document.querySelectorAll("#pm .chip").forEach(function(x){x.classList.remove("on")});b.classList.add("on")}});
+    $("#bk").onclick=draw;
+    $("#pay").onclick=function(){
+      var b=$("#pay");b.disabled=true;b.textContent="Processing payment…";
+      setTimeout(function(){
+        S.orders.unshift({id:"BK"+Math.floor(1000+Math.random()*9000),type:"booking",ph:e.name,who:st.doc,mode:st.mode,fee:fee,slot:st.slot,items:[]});
+        persist();closeSheet();toast("Paid and booked for "+st.slot);show("orders");
+      },1300);
+    };
+  }
+  draw();
+}
+function openRoom(o){
+  var chat=o.mode==="Chat",vid=!chat&&o.mode!=="Voice",stream=null,tm=null,t0=0;
+  var ini=(o.who||"Dr").replace(/^(Dr\.|Pharm\.)\s*/,"").split(" ").map(function(w){return w[0]}).join("").slice(0,2);
+  if(chat){
+    openSheet('<h3>Chat with '+o.who+'</h3><div class="msgs" id="msgs"></div><div class="row"><input id="mi" placeholder="Type a message" style="flex:1;padding:12px;border:1.5px solid var(--line);border-radius:12px;min-width:0"><button class="btn sm" id="ms">Send</button></div><div class="note">Demo chat: replies are simulated.</div><button class="btn out full" id="en" style="margin-top:10px">End consultation</button>');
+    var add=function(c,t){var d=document.createElement("div");d.className="bub "+c;d.textContent=t;$("#msgs").appendChild(d);$("#msgs").scrollTop=9999};
+    setTimeout(function(){add("d","Hello, I'm "+o.who+". How can I help you today?")},1200);
+    var send=function(){var v=$("#mi").value.trim();if(!v)return;add("u",v);$("#mi").value="";setTimeout(function(){add("d","Thanks for sharing. Let me look into that.")},1200)};
+    $("#ms").onclick=send;$("#mi").onkeydown=function(e){if(e.key==="Enter")send()};
+    $("#en").onclick=function(){closeSheet();toast("Consultation ended")};
+    return;
+  }
+  openSheet('<div class="room"><div class="av">'+ini+'</div><div class="t" style="color:#fff">'+o.who+'</div><div class="s" id="rs" style="color:#b9d9cc">Waiting to connect…</div><div class="tmr" id="tm">00:00</div>'+(vid?'<video id="me" class="me" autoplay muted playsinline></video>':'')+'</div>'+
+   '<div class="ctl"><button class="btn out" id="mu">Mute</button>'+(vid?'<button class="btn out" id="cm">Camera off</button>':'')+'<button class="btn red" id="en">End</button></div><div class="note">Demo room: the other person is simulated. Live calls will use WebRTC (Agora).</div>');
+  onClose=function(){clearInterval(tm);if(stream)stream.getTracks().forEach(function(t){t.stop()})};
+  if(navigator.mediaDevices&&navigator.mediaDevices.getUserMedia){
+    navigator.mediaDevices.getUserMedia({video:vid,audio:true}).then(function(s){stream=s;if(vid&&$("#me"))$("#me").srcObject=s}).catch(function(){toast("Allow microphone"+(vid?" and camera":"")+" to join")});
+  }else toast("Calls are not supported in this browser");
+  setTimeout(function(){if(!$("#rs"))return;$("#rs").textContent="Connected";t0=Date.now();tm=setInterval(function(){var s=Math.floor((Date.now()-t0)/1000);if($("#tm"))$("#tm").textContent=("0"+Math.floor(s/60)).slice(-2)+":"+("0"+s%60).slice(-2)},1000)},2500);
+  $("#mu").onclick=function(){if(stream)stream.getAudioTracks().forEach(function(t){t.enabled=!t.enabled});this.textContent=this.textContent==="Mute"?"Unmute":"Mute"};
+  if(vid)$("#cm").onclick=function(){if(stream)stream.getVideoTracks().forEach(function(t){t.enabled=!t.enabled});this.textContent=this.textContent==="Camera off"?"Camera on":"Camera off"};
+  $("#en").onclick=function(){closeSheet();toast("Consultation ended")};
+}
+
+/* ---------- ORDERS ---------- */
+function renderOrders(){
+  var n=S.orders.length;$("#obadge").hidden=!n;$("#obadge").textContent=n;
+  $("#orders").innerHTML=n?S.orders.map(function(o){
+    if(o.type==="booking")return '<div class="card"><div class="row"><div class="grow"><div class="t" style="color:var(--blue)">'+(o.mode||"Consultation")+' · '+o.id+'</div><div class="s">'+o.ph+'</div></div>'+(o.fee?'<span class="tag">Paid '+naira(o.fee)+'</span>':'<span class="tag">Confirmed</span>')+'</div><div class="s" style="margin-top:8px">'+(o.who||(o.items||[]).join(" · "))+'<br>Today, '+o.slot+'</div>'+(o.mode&&o.mode!=="In person"?'<button class="btn full" style="margin-top:10px" data-room="'+o.id+'">Join consultation room</button>':'<div class="s" style="margin-top:8px">Show this booking ID at reception.</div>')+'</div>';
+    var done=o.stage===STAGES.length-1;
+    return '<div class="card"><div class="row"><div class="grow"><div class="t">Order '+o.id+'</div><div class="s">'+o.ph+'</div></div><b>'+naira(o.total)+'</b></div>'+
+    '<div class="s" style="margin-top:6px">'+o.items.join(", ")+'</div>'+
+    '<ul class="steps">'+STAGES.map(function(s,i){return '<li class="'+(i<o.stage?'done':i===o.stage?(done?'done':'now'):'')+'">'+s+(i===2&&o.stage>=2?' – '+o.rider:'')+'</li>'}).join("")+'</ul>'+
+    (o.stage>=3&&!done?'<div class="s" style="margin-bottom:4px">Give this code to the rider on delivery</div><div class="otp">'+o.otp+'</div>':'')+'</div>';
+  }).join(""):'<div class="empty">Nothing yet. Order medicine or book a doctor to see it here.</div>';
+  document.querySelectorAll("[data-room]").forEach(function(b){b.onclick=function(){openRoom(S.orders.filter(function(o){return o.id===b.dataset.room})[0])}});
+}
+S.orders.forEach(function(o){if(o.type==="order")advance(o)});
+
+/* ---------- LOCATION ---------- */
+function setLoc(){
+  var c=["Lagos – Ikeja","Lagos – Lekki","Abuja – Wuse","Port Harcourt – GRA"];
+  var i=c.indexOf($("#locTxt").textContent);$("#locTxt").textContent=c[(i+1)%c.length];toast("Showing pharmacies and hospitals near "+$("#locTxt").textContent);
+}
+$("#loc").onclick=setLoc;
+
+renderPharm();updateCartBar();
+$("#obadge").hidden=!S.orders.length;$("#obadge").textContent=S.orders.length;
+})();
+</script>
+</body>
+</html>

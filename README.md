@@ -1,4 +1,4 @@
-# Hospiswift app
+# Hosirx app
 
 Static files. Serve the folder over http(s) (for example `npx serve .`) and open `index.html`.
 Video and voice calls need https (or localhost) for camera and microphone access.

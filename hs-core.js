@@ -1,4 +1,4 @@
-/* Hospiswift shared core.
+/* Hosirx shared core.
    Used by the app, the website and the partner dashboards.
    It stands in for the backend: listings, partner-set fees, stock, orders, visits (bookings,
    tickets, registrations) and profiles live in localStorage, so the customer side and the partner
@@ -105,19 +105,19 @@
   function luhn(s) { var n = 0, alt = false; for (var i = s.length - 1; i >= 0; i--) { var d = +s[i]; if (alt) { d *= 2; if (d > 9) d -= 9; } n += d; alt = !alt; } return n % 10 === 0; }
   var PCSS = ".hsp-bg{position:fixed;inset:0;background:rgba(10,25,20,.6);z-index:300;display:flex;align-items:flex-end;justify-content:center}" +
     "@media(min-width:600px){.hsp-bg{align-items:center}}" +
-    ".hsp{background:#fff;color:#10231C;width:100%;max-width:440px;max-height:94vh;overflow:auto;border-radius:22px 22px 0 0;padding:18px 18px calc(18px + env(safe-area-inset-bottom,0px));font-family:inherit}" +
+    ".hsp{background:#fff;color:#1B1D21;width:100%;max-width:440px;max-height:94vh;overflow:auto;border-radius:22px 22px 0 0;padding:18px 18px calc(18px + env(safe-area-inset-bottom,0px));font-family:inherit}" +
     "@media(min-width:600px){.hsp{border-radius:22px}}" +
-    ".hsp-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}.hsp-x{width:34px;height:34px;border-radius:50%;background:#EEF3F0;font-size:15px;border:0;cursor:pointer}" +
-    ".hsp-amt{font-size:30px;font-weight:800;letter-spacing:-.5px}.hsp-amt span{display:block;font-size:13px;font-weight:600;color:#5D6F68;letter-spacing:0;margin-top:2px}" +
-    ".hsp-tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:14px 0}.hsp-tabs button{padding:10px 4px;border-radius:10px;border:1.5px solid #DCE6E1;background:#fff;font-weight:700;font-size:13px;cursor:pointer;font-family:inherit}" +
-    ".hsp-tabs button.on{background:var(--accent,var(--a,#0B7A55));border-color:var(--accent,var(--a,#0B7A55));color:#fff}" +
+    ".hsp-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}.hsp-x{width:34px;height:34px;border-radius:50%;background:#ECEDEF;font-size:15px;border:0;cursor:pointer}" +
+    ".hsp-amt{font-size:30px;font-weight:800;letter-spacing:-.5px}.hsp-amt span{display:block;font-size:13px;font-weight:600;color:#5E626A;letter-spacing:0;margin-top:2px}" +
+    ".hsp-tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:14px 0}.hsp-tabs button{padding:10px 4px;border-radius:10px;border:1.5px solid #DADCE0;background:#fff;font-weight:700;font-size:13px;cursor:pointer;font-family:inherit}" +
+    ".hsp-tabs button.on{background:var(--accent,var(--a,#128A28));border-color:var(--accent,var(--a,#128A28));color:#fff}" +
     ".hsp-f{margin-bottom:12px;flex:1}.hsp-f label{display:block;font-weight:700;font-size:13px;margin-bottom:5px}" +
-    ".hsp-f input,.hsp-f select{width:100%;padding:13px;border:1.5px solid #DCE6E1;border-radius:12px;font:inherit;background:#fff;color:#10231C}" +
-    ".hsp-r{display:flex;gap:10px}.hsp-err{color:#D32F2F;font-weight:600;font-size:13px;margin:-4px 0 10px}" +
-    ".hsp-go{width:100%;padding:14px;border-radius:12px;border:0;background:var(--accent,var(--a,#0B7A55));color:#fff;font:inherit;font-weight:800;cursor:pointer}.hsp-go:disabled{opacity:.5}" +
-    ".hsp-box{background:#F2F7F4;border-radius:14px;padding:14px;margin-bottom:12px;font-size:14px;line-height:1.5}.hsp-box b{font-size:20px;letter-spacing:1px;display:block;margin:2px 0}" +
-    ".hsp-note{font-size:12px;color:#5D6F68;text-align:center;margin-top:12px}.hsp-hint{font-size:12px;color:#5D6F68;margin:-2px 0 12px}" +
-    ".hsp-ok{text-align:center;padding:10px 0}.hsp-ok i{display:grid;place-items:center;width:64px;height:64px;margin:0 auto 10px;border-radius:50%;background:#E3F4EC;color:#0B7A55;font-size:32px;font-style:normal}";
+    ".hsp-f input,.hsp-f select{width:100%;padding:13px;border:1.5px solid #DADCE0;border-radius:12px;font:inherit;background:#fff;color:#1B1D21}" +
+    ".hsp-r{display:flex;gap:10px}.hsp-err{color:#D93025;font-weight:600;font-size:13px;margin:-4px 0 10px}" +
+    ".hsp-go{width:100%;padding:14px;border-radius:12px;border:0;background:var(--accent,var(--a,#128A28));color:#fff;font:inherit;font-weight:800;cursor:pointer}.hsp-go:disabled{opacity:.5}" +
+    ".hsp-box{background:#F3F4F6;border-radius:14px;padding:14px;margin-bottom:12px;font-size:14px;line-height:1.5}.hsp-box b{font-size:20px;letter-spacing:1px;display:block;margin:2px 0}" +
+    ".hsp-note{font-size:12px;color:#5E626A;text-align:center;margin-top:12px}.hsp-hint{font-size:12px;color:#5E626A;margin:-2px 0 12px}" +
+    ".hsp-ok{text-align:center;padding:10px 0}.hsp-ok i{display:grid;place-items:center;width:64px;height:64px;margin:0 auto 10px;border-radius:50%;background:#E3F7E8;color:#128A28;font-size:32px;font-style:normal}";
   function pcss() { if (document.getElementById("hsp-css")) return; var s = document.createElement("style"); s.id = "hsp-css"; s.textContent = PCSS; document.head.appendChild(s); }
   var BANKS = { "GTBank": "737", "Access Bank": "901", "UBA": "919", "Zenith Bank": "966", "First Bank": "894" };
 
@@ -125,7 +125,7 @@
     return new Promise(function (resolve) {
       var ref = "HSP" + Date.now().toString(36).toUpperCase().slice(-6) + Math.floor(10 + Math.random() * 90);
       if (HS.config.paystackKey) { /* live gateway (not exercised in the demo) */
-        var go = function () { w.PaystackPop.setup({ key: HS.config.paystackKey, email: o.email || "customer@hospiswift.app", amount: Math.round(o.amount * 100), currency: "NGN", ref: ref,
+        var go = function () { w.PaystackPop.setup({ key: HS.config.paystackKey, email: o.email || "customer@hosirx.app", amount: Math.round(o.amount * 100), currency: "NGN", ref: ref,
           callback: function (r) { resolve({ ref: r.reference, method: "paystack", amount: o.amount, at: Date.now() }); }, onClose: function () { resolve(null); } }).openIframe(); };
         if (w.PaystackPop) return go();
         var sc = document.createElement("script"); sc.src = "https://js.paystack.co/v1/inline.js"; sc.onload = go; sc.onerror = function () { resolve(null); }; document.head.appendChild(sc); return;
@@ -133,7 +133,7 @@
       pcss();
       var st = { m: "card", busy: false, done: null, bank: "GTBank", acct: String(Math.floor(1e9 + Math.random() * 9e9)) };
       var bg = document.createElement("div"); bg.className = "hsp-bg";
-      bg.innerHTML = '<div class="hsp" role="dialog" aria-modal="true" aria-label="Payment"><div class="hsp-top"><b>Hospiswift Pay</b><button class="hsp-x" data-x aria-label="Close payment">✕</button></div>' +
+      bg.innerHTML = '<div class="hsp" role="dialog" aria-modal="true" aria-label="Payment"><div class="hsp-top"><b>Hosirx Pay</b><button class="hsp-x" data-x aria-label="Close payment">✕</button></div>' +
         '<div class="hsp-amt">' + HS.naira(o.amount) + '<span>' + HS.esc(o.title || "Payment") + '</span></div><div id="hspTabs"></div><div id="hspBody"></div><p class="hsp-note">Demo checkout. No money moves. Never enter a real card here.</p></div>';
       document.body.appendChild(bg);
       var prevFocus = document.activeElement;
@@ -151,7 +151,7 @@
         else if (st.m === "card") h = '<div class="hsp-f"><label for="hc-n">Card number</label><input id="hc-n" inputmode="numeric" autocomplete="off" maxlength="23" placeholder="0000 0000 0000 0000"></div>' +
           '<div class="hsp-r"><div class="hsp-f"><label for="hc-e">Expiry</label><input id="hc-e" inputmode="numeric" autocomplete="off" maxlength="5" placeholder="MM/YY"></div><div class="hsp-f"><label for="hc-c">CVV</label><input id="hc-c" type="password" inputmode="numeric" autocomplete="off" maxlength="4" placeholder="123"></div></div>' +
           '<div class="hsp-hint">Test card: 4084 0840 8408 4081 · any future date · CVV 408</div><div class="hsp-err" id="hspErr" role="alert" hidden></div><button class="hsp-go" data-card>Pay ' + HS.naira(o.amount) + '</button>';
-        else if (st.m === "bank") h = '<div class="hsp-box">Transfer exactly ' + HS.naira(o.amount) + ' to<b>' + st.acct + '</b>Wema Bank · Hospiswift Pay (demo account)<br>This account expires in 30 minutes.</div><button class="hsp-go" data-bank>I have sent the money</button>';
+        else if (st.m === "bank") h = '<div class="hsp-box">Transfer exactly ' + HS.naira(o.amount) + ' to<b>' + st.acct + '</b>Wema Bank · Hosirx Pay (demo account)<br>This account expires in 30 minutes.</div><button class="hsp-go" data-bank>I have sent the money</button>';
         else h = '<div class="hsp-f"><label for="hu-b">Your bank</label><select id="hu-b">' + Object.keys(BANKS).map(function (b) { return '<option' + (b === st.bank ? " selected" : "") + '>' + b + '</option>'; }).join("") + '</select></div>' +
           '<div class="hsp-box">Dial this code on your phone<b id="hspUssd">*' + BANKS[st.bank] + '*000*' + Math.round(o.amount) + '#</b>Then confirm with your PIN.</div><button class="hsp-go" data-ussd>I have paid</button>';
         $("#hspBody").innerHTML = h;

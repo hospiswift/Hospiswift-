@@ -1,4 +1,4 @@
-/* Hospiswift consultation room (app only): video, voice and chat.
+/* Hosirx consultation room (app only): video, voice and chat.
    HS_ROOM.open({id, role: "patient"|"host", mode: "Video"|"Voice"|"Chat", name, onEnd})
    The patient and the pharmacy or hospital join the same room id.
    Media is real WebRTC. Signalling runs over BroadcastChannel, so two tabs or frames of the same
@@ -6,19 +6,19 @@
    signalling server and add a TURN server (or use Agora, Twilio or Daily). */
 (function (w) {
   "use strict";
-  var CSS = ".hsr{position:fixed;inset:0;z-index:400;background:#0A1F18;color:#fff;display:flex;flex-direction:column;font-family:inherit}" +
+  var CSS = ".hsr{position:fixed;inset:0;z-index:400;background:#25272B;color:#fff;display:flex;flex-direction:column;font-family:inherit}" +
     ".hsr-top{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:calc(14px + env(safe-area-inset-top,0px)) 16px 10px}" +
-    ".hsr-top b{font-size:17px}.hsr-st{font-size:13px;color:#B9D9CC}.hsr-tm{font-weight:800;font-size:18px}" +
-    ".hsr-stage{flex:1;position:relative;display:flex;align-items:center;justify-content:center;min-height:0;margin:0 12px;border-radius:18px;background:#0F2A22;overflow:hidden}" +
+    ".hsr-top b{font-size:17px}.hsr-st{font-size:13px;color:#C9CBD0}.hsr-tm{font-weight:800;font-size:18px}" +
+    ".hsr-stage{flex:1;position:relative;display:flex;align-items:center;justify-content:center;min-height:0;margin:0 12px;border-radius:18px;background:#2F3238;overflow:hidden}" +
     ".hsr-rv{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;background:#000}.hsr-rv.off{display:none}" +
-    ".hsr-av{width:96px;height:96px;border-radius:50%;background:var(--accent,var(--a,#0B7A55));display:grid;place-items:center;font-weight:800;font-size:32px;position:relative}" +
+    ".hsr-av{width:96px;height:96px;border-radius:50%;background:var(--accent,var(--a,#128A28));display:grid;place-items:center;font-weight:800;font-size:32px;position:relative}" +
     ".hsr-lv{position:absolute;right:10px;bottom:10px;width:96px;height:128px;object-fit:cover;border-radius:12px;background:#000;transform:scaleX(-1);border:2px solid rgba(255,255,255,.4)}" +
-    ".hsr-note{text-align:center;font-size:13px;color:#B9D9CC;padding:8px 16px}.hsr-note button{margin-top:6px;background:#fff;color:#0A1F18;font-weight:700;border-radius:10px;padding:9px 14px;border:0;cursor:pointer;font:inherit;font-weight:700}" +
-    ".hsr-ctl{display:flex;gap:10px;padding:10px 16px calc(16px + env(safe-area-inset-bottom,0px))}.hsr-ctl button{flex:1;padding:14px;border-radius:14px;border:0;font:inherit;font-weight:800;cursor:pointer;background:#1E3B31;color:#fff}.hsr-ctl .end{background:#D32F2F}" +
-    ".hsr-chat{flex:1;display:flex;flex-direction:column;min-height:0;margin:0 12px;background:#fff;color:#10231C;border-radius:18px;overflow:hidden}" +
+    ".hsr-note{text-align:center;font-size:13px;color:#C9CBD0;padding:8px 16px}.hsr-note button{margin-top:6px;background:#fff;color:#25272B;font-weight:700;border-radius:10px;padding:9px 14px;border:0;cursor:pointer;font:inherit;font-weight:700}" +
+    ".hsr-ctl{display:flex;gap:10px;padding:10px 16px calc(16px + env(safe-area-inset-bottom,0px))}.hsr-ctl button{flex:1;padding:14px;border-radius:14px;border:0;font:inherit;font-weight:800;cursor:pointer;background:#3B3E44;color:#fff}.hsr-ctl .end{background:#D93025}" +
+    ".hsr-chat{flex:1;display:flex;flex-direction:column;min-height:0;margin:0 12px;background:#fff;color:#1B1D21;border-radius:18px;overflow:hidden}" +
     ".hsr-msgs{flex:1;overflow:auto;padding:12px;display:flex;flex-direction:column;gap:8px}.hsr-b{max-width:80%;padding:8px 12px;border-radius:14px;font-size:14px}" +
-    ".hsr-b.o{background:#E3F4EC;align-self:flex-start}.hsr-b.m{background:var(--accent,var(--a,#0B7A55));color:#fff;align-self:flex-end}" +
-    ".hsr-in{display:flex;gap:8px;padding:10px;border-top:1.5px solid #DCE6E1}.hsr-in input{flex:1;min-width:0;padding:12px;border:1.5px solid #DCE6E1;border-radius:12px;font:inherit}.hsr-in button{padding:0 16px;border-radius:12px;border:0;background:var(--accent,var(--a,#0B7A55));color:#fff;font-weight:800;cursor:pointer}";
+    ".hsr-b.o{background:#E3F7E8;align-self:flex-start}.hsr-b.m{background:var(--accent,var(--a,#128A28));color:#fff;align-self:flex-end}" +
+    ".hsr-in{display:flex;gap:8px;padding:10px;border-top:1.5px solid #DADCE0}.hsr-in input{flex:1;min-width:0;padding:12px;border:1.5px solid #DADCE0;border-radius:12px;font:inherit}.hsr-in button{padding:0 16px;border-radius:12px;border:0;background:var(--accent,var(--a,#128A28));color:#fff;font-weight:800;cursor:pointer}";
   var ICE = { iceServers: [{ urls: "stun:stun.l.google.com:19302" }] };
   function esc(s) { return String(s == null ? "" : s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
 

@@ -55,6 +55,36 @@ h2{font-size:20px;font-weight:800;margin-bottom:4px}.sub{color:var(--mute);font-
 .steps li.now:before{border-color:var(--a);box-shadow:0 0 0 4px var(--al)}
 .ref{background:var(--al);color:var(--ad);font-weight:800;border-radius:12px;padding:10px;text-align:center;letter-spacing:1px}
 .note{font-size:12px;color:var(--mute);text-align:center;margin-top:16px}
+main.tp{padding-bottom:104px}
+.tabs{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:560px;background:#fff;border-top:1.5px solid var(--line);display:flex;padding:6px 6px calc(6px + env(safe-area-inset-bottom,0px));z-index:30}
+.tabs button{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:12px;font-weight:600;color:var(--mute);padding:6px 0;position:relative}
+.tabs button.on{color:var(--a)}.tabs svg{width:24px;height:24px}
+.tabs .bd{position:absolute;top:0;right:24%;background:var(--red);color:#fff;font-size:11px;border-radius:99px;min-width:18px;line-height:18px;padding:0 5px}
+.card{background:#fff;border:1.5px solid var(--line);border-radius:16px;padding:14px;margin-bottom:12px}
+.r{display:flex;gap:10px;align-items:center;justify-content:space-between}
+.t{font-weight:700}.s{font-size:13px;color:var(--mute)}
+.tag{display:inline-block;font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;background:var(--al);color:var(--ad);white-space:nowrap}
+.tag.rx{background:#FFF1DC;color:#9A5B00}.tag.red{background:#FDE8E8;color:var(--red)}.tag.gr{background:#EEF1F0;color:var(--mute)}
+.sw{width:52px;height:30px;border-radius:99px;background:#C9D6D0;position:relative;flex:none;transition:background .2s}
+.sw i{position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;background:#fff;transition:left .2s}
+.sw[aria-checked=true]{background:var(--a)}.sw[aria-checked=true] i{left:25px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.stat{background:#fff;border:1.5px solid var(--line);border-radius:14px;padding:12px}.stat b{display:block;font-size:20px;margin-top:2px}
+.btn.sm{padding:9px 14px;width:auto;margin:0;font-size:14px}.btn.red{background:var(--red)}
+a.btn{display:block;text-align:center;text-decoration:none}
+.acts{display:flex;gap:8px;margin-top:12px}.acts .btn{flex:1;margin:0;padding:11px}
+.alert{background:#FDE8E8;border:1.5px solid var(--red);border-radius:16px;padding:14px;margin-bottom:12px}
+.empty{text-align:center;color:var(--mute);padding:36px 10px}
+.sl{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0}
+.slotb{padding:9px 0;border-radius:10px;border:1.5px solid var(--line);background:#fff;font-weight:700;font-size:13px}
+.slotb.on{background:var(--a);border-color:var(--a);color:#fff}.slotb.off{color:var(--mute);text-decoration:line-through}
+.slotb.bk{background:var(--al);color:var(--ad);border-color:var(--al)}.slotb small{display:block;font-size:10px;font-weight:600}
+.sheetbg{position:fixed;inset:0;background:rgba(10,25,20,.5);z-index:40;display:none}.sheetbg.on{display:block}
+.psheet{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:560px;max-height:90vh;overflow:auto;background:var(--bg);border-radius:22px 22px 0 0;padding:18px 16px calc(20px + env(safe-area-inset-bottom,0px));z-index:50;display:none}.psheet.on{display:block}
+.toast{position:fixed;top:14px;left:50%;transform:translateX(-50%) translateY(-90px);background:var(--ink);color:#fff;padding:11px 18px;border-radius:12px;font-weight:600;font-size:14px;z-index:99;transition:transform .3s;max-width:90%;text-align:center}.toast.on{transform:translateX(-50%) translateY(0)}
+.doc .rm,.card .rm{color:var(--red);font-weight:700;font-size:13px;margin-top:6px}
+.lst{display:block}
+@media(min-width:900px){body{max-width:940px}.tabs{max-width:940px}.psheet{max-width:560px}.lst{display:grid;grid-template-columns:repeat(2,1fr);gap:0 14px}.grid2{grid-template-columns:repeat(4,1fr)}main{padding-left:24px;padding-right:24px}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
@@ -66,10 +96,12 @@ h2{font-size:20px;font-weight:800;margin-bottom:4px}.sub{color:var(--mute);font-
 </header>
 <main id="app"></main>
 
+<script src="hs-core.js"></script>
 <script>
 (function(){
 "use strict";
 var $=function(s){return document.querySelector(s)};
+var QS=new URLSearchParams(location.search),DEMO=QS.get("demo")||"",WEB=QS.get("web")==="1",TYPE=QS.get("type")||"";
 var STATES=["Lagos","FCT Abuja","Rivers","Oyo","Kano","Enugu","Edo","Kaduna","Ogun","Delta","Anambra","Other"];
 var BANKS=["Access Bank","GTBank","First Bank","UBA","Zenith Bank","Opay","Moniepoint","Kuda","Other"];
 function M(id,l,r,hint){return {id:id,l:l,t:"text",v:"money",r:r,h:hint}}
@@ -107,7 +139,7 @@ var FLOW={
    {id:"radius",l:"Delivery radius",t:"select",o:["Up to 3 km","Up to 5 km","Up to 10 km"],r:1},
    {id:"prep",l:"Usual preparation time",t:"select",o:["Under 10 min","10–20 min","20–30 min"],r:1},
    {id:"rx",l:"I accept prescription orders and will verify them before dispatch.",t:"check"}]},
-  {title:"Consultation fees",sub:"Pharmacist consultations open a video, voice or chat room. "+"You set the price. Patients pay it in the app before the appointment is confirmed. You can change it later.",f:[M("fVideo","Video consultation (₦)",1,"Example: 2000"),M("fVoice","Voice call (₦)",1),M("fChat","Chat (₦)",1)]},
+  {title:"Consultation fees",sub:"Pharmacist consultations open a video, voice or chat room. "+"You set the price. Patients pay it through the payment gateway before the appointment is confirmed. You can change it, and add more appointment types, later in your dashboard.",f:[M("fVideo","Video consultation (₦)",1,"Example: 2000"),M("fVoice","Voice call (₦)",1),M("fChat","Chat (₦)",1)]},
   {title:"Payout account",sub:"Where we send your earnings.",f:PAY}]},
  hosp:{label:"Hospital",steps:[
   {title:"Facility details",sub:"Tell us who you are.",f:BIZ},
@@ -126,16 +158,29 @@ var FLOW={
    {id:"depts",l:"Departments",t:"chips",o:DEPTS,r:1},
    {id:"modes",l:"Consultation options",t:"chips",o:["Video","Chat","In person"],r:1}]},
   {title:"Doctors",sub:"Add at least one doctor patients can book.",f:[{id:"docs",t:"docs",r:1}]},
-  {title:"Consultation fees",sub:"You set the price. Patients pay it in the app before the appointment is confirmed. You can change it later.",f:[M("fVideo","Video consultation (₦)",1,"Example: 8000"),M("fVoice","Voice call (₦)",1),M("fChat","Chat (₦)",1),M("fIn","In-person visit (₦)",1),M("fEmerg","Emergency consultation (₦)",1,"Charged for non-life-threatening emergency bookings."),M("fFollow","Follow-up visit (₦)",1),M("fSpec","Specialist consultation (₦)",0,"Optional"),M("fAnte","Antenatal or maternity visit (₦)",0,"Optional")]},
+  {title:"Consultation fees",sub:"You set the price. Patients pay it through the payment gateway before the appointment is confirmed. You can change it, and add more appointment types, later in your dashboard.",f:[M("fVideo","Video consultation (₦)",1,"Example: 8000"),M("fVoice","Voice call (₦)",1),M("fChat","Chat (₦)",1),M("fIn","In-person visit (₦)",1),M("fEmerg","Emergency consultation (₦)",1,"Charged for non-life-threatening emergency bookings."),M("fFollow","Follow-up visit (₦)",1),M("fSpec","Specialist consultation (₦)",0,"Optional"),M("fAnte","Antenatal or maternity visit (₦)",0,"Optional"),M("fReg","New patient registration (₦)",0,"Optional. Charged once when a patient registers with you on the website or app.")]},
   {title:"Payout account",sub:"Where we send consultation earnings.",f:PAY}]}
 };
 
 /* ---------- State ---------- */
 var S={type:null,step:0,d:{},err:{},docs:[{n:"",m:"",s:""}]};
-try{var sv=JSON.parse(localStorage.getItem("hs_partner")||"null");if(sv&&sv.type){S.type=sv.type;S.d=sv.d||{};S.step=sv.step||0;if(sv.docs&&sv.docs.length)S.docs=sv.docs}}catch(e){}
-function save(){try{localStorage.setItem("hs_partner",JSON.stringify({type:S.type,d:S.d,step:S.step,docs:S.docs}))}catch(e){}}
+try{var sv=JSON.parse(localStorage.getItem("hs_partner")||"null");if(sv&&sv.type){S.type=sv.type;S.d=sv.d||{};S.step=sv.step||0;S.ref=sv.ref;S.stage=sv.stage||0;if(sv.docs&&sv.docs.length)S.docs=sv.docs}}catch(e){}
+function save(){if(DEMO)return;try{localStorage.setItem("hs_partner",JSON.stringify({type:S.type,d:S.d,step:S.step,docs:S.docs,ref:S.ref,stage:S.stage}))}catch(e){}}
+/* Demo accounts (index.html?demo): an approved partner, held in memory only, never saved */
+var SEEDS={
+ pharm:{type:"pharm",ref:"HS-PH-DEMO1",d:{name:"HealthPlus Pharmacy",state:"Lagos",city:"Ikeja",addr:"12 Allen Avenue",phone:"08000000002",email:"demo.pharmacy@hospiswift.demo",fVideo:"2000",fVoice:"1500",fChat:"1000",bank:"GTBank",acct:"0123456789",acctName:"HealthPlus Pharmacy Ltd"}},
+ hosp:{type:"hosp",ref:"HS-HO-DEMO1",d:{name:"Lagoon General Hospital",state:"Lagos",city:"Ikeja",addr:"5 Obafemi Awolowo Way",phone:"08000000003",email:"demo.hospital@hospiswift.demo",em:true,amb:true,emPhone:"08000000001",fVideo:"8000",fVoice:"6000",fChat:"4000",fIn:"10000",fEmerg:"15000",fFollow:"5000",fSpec:"12000",fAnte:"9000",fReg:"3000",bank:"Access Bank",acct:"0987654321",acctName:"Lagoon General Hospital Ltd"},docs:[{n:"Dr. Adeyemi",m:"MDCN 11111",s:"GP"},{n:"Dr. Okafor",m:"MDCN 22222",s:"Paediatrics"}]}
+};
+if(SEEDS[DEMO]){var sd=SEEDS[DEMO];S.type=sd.type;S.d=sd.d;S.ref=sd.ref;S.stage=3;S.step=99;if(sd.docs)S.docs=sd.docs}
 function esc(s){return String(s==null?"":s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
 function flow(){return FLOW[S.type]}
+/* Embedded inside the Hospiswift sign-in page (index.html?embed=apply|portal) */
+var EMB=new URLSearchParams(location.search).get("embed")||"",IN=window.parent!==window&&(EMB==="apply"||EMB==="portal");
+if(IN){
+  var bk0=document.querySelector(".back");
+  bk0.textContent=EMB==="portal"?"Sign out":"Back";bk0.setAttribute("href","#");
+  bk0.onclick=function(e){e.preventDefault();window.parent.postMessage({hs:"partner-exit"},"*")};
+}
 function theme(){document.body.classList.toggle("hosp",S.type==="hosp")}
 
 /* ---------- Validation ---------- */
@@ -168,7 +213,8 @@ function field(f){
 }
 
 function render(){
-  theme();var app=$("#app");
+  theme();var app=$("#app");app.classList.remove("tp");
+  if(!S.type&&(TYPE==="pharm"||TYPE==="hosp")){S.type=TYPE;S.step=0;S.d={};S.err={};save()}
   if(!S.type){
     $("#bar").style.display="none";$("#hp").textContent="Sell medicine or offer care to patients near you.";
     app.innerHTML='<h2>Join Hospiswift</h2><p class="sub">Choose how you want to work with us.</p>'+
@@ -232,17 +278,402 @@ function review(){
 }
 
 function done(){
+  if(S.stage>=3&&!(IN&&EMB==="apply"))return dash();
   $("#bar").style.display="block";$("#bi").style.width="100%";
   var pharm=S.type==="pharm";
   var ST=["Application received",pharm?"Documents checked (CAC, PCN premises, pharmacist)":"Documents checked (CAC, facility licence, MDCN)","Verification call and address check",pharm?"Approved. Add your drug catalogue":"Approved. Your profile goes live"];
-  $("#hp").textContent="Application submitted";
-  $("#app").innerHTML='<h2>Thanks, '+esc(S.d.name||"partner")+'</h2><p class="sub">We are reviewing your application. Most reviews take 1–3 working days. This demo speeds it up.</p>'+
+  $("#hp").textContent=S.stage>=3?"Partner account":"Application submitted";
+  $("#app").innerHTML=(S.stage>=3?'<h2>Welcome, '+esc(S.d.name||"partner")+'</h2><p class="sub">You are approved and verified.'+(DEMO?' This is a demo account.':'')+'</p>':'<h2>Thanks, '+esc(S.d.name||"partner")+'</h2><p class="sub">We are reviewing your application. Most reviews take 1–3 working days. This demo speeds it up.</p>')+
    '<div class="ref">'+S.ref+'</div><ul class="steps" id="st">'+ST.map(function(s,i){return '<li class="'+(i<S.stage?'done':i===S.stage?'now':'')+'">'+s+'</li>'}).join("")+'</ul>'+
    (S.stage>=3?'<div class="rev"><h3>Next</h3><div><span>'+(pharm?'Upload stock, set prices, switch to online and start receiving orders.':'Confirm your emergency line and doctor slots, then go live to nearby patients.')+'</span></div></div>':'')+
-   '<button class="btn out" id="rs">Start a new application</button>';
-  $("#rs").onclick=function(){S={type:null,step:0,d:{},err:{},docs:[{n:"",m:"",s:""}]};save();render()};
+   (IN&&EMB==="portal"?'':'<button class="btn out" id="rs">Start a new application</button>')+
+   (IN&&EMB==="apply"?'<p class="note">Once approved, sign in from the Hospiswift home screen with '+esc(S.d.email||"your email")+'.</p>':'');
+  var rs=$("#rs");if(rs)rs.onclick=function(){S={type:null,step:0,d:{},err:{},docs:[{n:"",m:"",s:""}]};save();render()};
   if(S.stage<3){clearTimeout(done.t);done.t=setTimeout(function(){S.stage++;save();done()},2500)}
 }
+
+/* ---------- PARTNER DASHBOARD (approved partners) ---------- */
+var PK=DEMO?"hs_portal_demo_"+DEMO:"hs_portal",P=null,TB="",OF="new",SF="all",BF="up",SH=false,simT=null,simN=0,beatT=null,hooked=false;
+var TIMES=HS.TIMES;
+var CATS=["Pain & fever","Vitamins","Stomach","Allergy","Antibiotics","Chronic care","Malaria","Other"];
+var NAMES=["Bola K.","Sam O.","Hauwa M.","Kelechi U.","Yemi T.","Dami F.","Rita N."];
+var RIDERS=["Tunde A.","Chidi O.","Musa I.","Sade B."];
+var FEEKEYS={"Video":"fVideo","Voice":"fVoice","Chat":"fChat","In person":"fIn","Emergency":"fEmerg","Follow-up":"fFollow","Specialist":"fSpec","Antenatal":"fAnte","Registration":"fReg"};
+var IC={orders:'<path d="M6 2h12v20l-3-2-3 2-3-2-3 2zM9 8h6M9 12h6"/>',stock:'<path d="M21 8l-9-5-9 5v8l9 5 9-5zM3 8l9 5 9-5M12 13v8"/>',chat:'<path d="M21 12a8 8 0 0 1-11.5 7.2L4 21l1.8-5.5A8 8 0 1 1 21 12z"/>',wallet:'<path d="M3 7h16a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2zM3 7l12-4v4M17 14h.01"/>',cal:'<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/>',user:'<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>'};
+function svg(k){return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">'+IC[k]+'</svg>'}
+var naira=HS.naira,since=HS.since;
+function ago(m){return Date.now()-m*60000}
+function num(v,def){var n=Number(String(v==null?"":v).replace(/[,\s]/g,""));return n>0?n:def}
+function oid(p){return p+Math.floor(1000+Math.random()*9000)}
+function pick(a){return a[Math.floor(Math.random()*a.length)]}
+function toast(m){var t=$("#toast");if(!t){t=document.createElement("div");t.id="toast";t.className="toast";document.body.appendChild(t)}t.textContent=m;t.classList.add("on");clearTimeout(toast.t);toast.t=setTimeout(function(){t.classList.remove("on")},2400)}
+function pid(){return DEMO?(S.type==="pharm"?"p1":"h1"):"x"+String(S.ref||"").replace(/[^A-Za-z0-9]/g,"")}
+function dl(d){return d.n+(d.s?" – "+d.s:"")}
+function osub(o){return o.items.reduce(function(a,i){return a+i.q*i.p},0)}
+function ord(id){return P.orders.filter(function(o){return o.id===id})[0]}
+function cons(id){return P.consults.filter(function(c){return c.id===id})[0]}
+function bk(id){return P.bookings.filter(function(b){return b.id===id})[0]}
+function stk(n){return P.stock.filter(function(s){return s.n===n})[0]}
+function stkId(id){return P.stock.filter(function(s){return String(s.id)===String(id)})[0]}
+function sw(a,on,label,i){return '<button class="sw" role="switch" aria-checked="'+(on?"true":"false")+'" aria-label="'+label+'" data-a="'+a+'"'+(i!=null?' data-i="'+i+'"':'')+'><i></i></button>'}
+function chipsH(a,pairs,cur){return '<div class="chips" style="margin-bottom:12px">'+pairs.map(function(p){return '<button class="chip'+(p[0]===cur?' on':'')+'" data-a="'+a+'" data-i="'+p[0]+'">'+p[1]+'</button>'}).join("")+'</div>'}
+function empty(m){return '<div class="empty">'+m+'</div>'}
+function lst(h){return '<div class="lst">'+h+'</div>'}
+
+/* ----- persistence and sharing with customers ----- */
+function pLocal(){try{localStorage.setItem(PK,JSON.stringify(P))}catch(e){}}
+function listing(){
+  var d=S.d||{},h=0,ref=String(S.ref||"");for(var i=0;i<ref.length;i++)h=(h*31+ref.charCodeAt(i))%97;
+  var l={id:pid(),kind:S.type==="pharm"?"pharm":"hosp",name:d.name||"New partner",km:Math.round((1+h%40/10)*10)/10,rating:"New",fees:P.fees};
+  if(S.type==="pharm"){l.eta=30+h%20;l.open=d.hours||"See hours on request";l.closed=!P.online}
+  else{l.type="Clinic";l.open24=!!P.open24;l.phone=P.line||d.phone||"";l.docs=P.docs.filter(function(x){return x.on}).map(dl)}
+  return l;
+}
+function pPublish(){
+  HS.setFees(pid(),P.fees);
+  if(S.type==="pharm")HS.setStock(pid(),P.stock);
+  else{var av={};P.docs.forEach(function(d){var taken=P.bookings.filter(function(b){return b.doc===dl(d)&&b.slot&&b.slot!=="Now"&&b.st!=="noshow"}).map(function(b){return b.slot});av[dl(d)]={on:d.on?1:0,off:d.off.concat(taken)}});HS.setAvail(pid(),av)}
+  if(!DEMO)HS.publish(listing());
+}
+function pSave(){pLocal();pPublish()}
+function pInit(){
+  var d=S.d||{},ph=S.type==="pharm",D=!!DEMO,fees={};
+  (ph?["Video","Voice","Chat"]:Object.keys(FEEKEYS)).forEach(function(k){var n=num(d[FEEKEYS[k]],0);if(n)fees[k]=n});
+  var X={type:S.type,fees:fees,pay:{bank:d.bank||"",acct:String(d.acct||""),name:d.acctName||""},last:D?(ph?126500:482000):0,carry:D?(ph?58200:214000):0};
+  if(ph){
+    X.online=D;
+    X.stock=D?[
+      {id:1,n:"Paracetamol 500mg",c:"Pain & fever",k:"Pack of 20",p:600,q:120,rx:0,on:1},
+      {id:2,n:"Ibuprofen 400mg",c:"Pain & fever",k:"Pack of 10",p:900,q:8,rx:0,on:1},
+      {id:3,n:"Vitamin C 1000mg",c:"Vitamins",k:"Tube of 10",p:1800,q:45,rx:0,on:1},
+      {id:4,n:"ORS Sachets",c:"Stomach",k:"Box of 5",p:1200,q:60,rx:0,on:1},
+      {id:5,n:"Loratadine 10mg",c:"Allergy",k:"Pack of 10",p:1500,q:32,rx:0,on:1},
+      {id:6,n:"Amoxicillin 500mg",c:"Antibiotics",k:"Pack of 21",p:3500,q:25,rx:1,on:1},
+      {id:7,n:"Metformin 500mg",c:"Chronic care",k:"Pack of 30",p:2800,q:4,rx:1,on:1},
+      {id:8,n:"Amlodipine 5mg",c:"Chronic care",k:"Pack of 30",p:3200,q:18,rx:1,on:1},
+      {id:9,n:"Artemether/Lumefantrine",c:"Malaria",k:"Adult course",p:2500,q:0,rx:0,on:1}]:[];
+    X.orders=D?[
+      {id:"HS4821",cust:"Ada O.",addr:"14 Opebi Road, Ikeja",items:[{n:"Paracetamol 500mg",q:2,p:600},{n:"Vitamin C 1000mg",q:1,p:1800}],rx:0,st:"new",t:ago(3)},
+      {id:"HS4819",cust:"Emeka N.",addr:"3 Allen Avenue, Ikeja",items:[{n:"Amoxicillin 500mg",q:1,p:3500},{n:"ORS Sachets",q:2,p:1200}],rx:1,rxOk:false,st:"new",t:ago(7)},
+      {id:"HS4815",cust:"Funke A.",addr:"22 Awolowo Way, Ikeja",items:[{n:"Loratadine 10mg",q:1,p:1500}],rx:0,st:"preparing",t:ago(15)},
+      {id:"HS4811",cust:"Ibrahim S.",addr:"9 Adeniyi Jones, Ikeja",items:[{n:"Metformin 500mg",q:1,p:2800},{n:"Amlodipine 5mg",q:1,p:3200}],rx:1,rxOk:true,st:"ready",rider:"Chidi O.",t:ago(24)},
+      {id:"HS4806",cust:"Ngozi E.",addr:"1 Toyin Street, Ikeja",items:[{n:"Ibuprofen 400mg",q:1,p:900},{n:"ORS Sachets",q:1,p:1200}],rx:0,st:"out",rider:"Tunde A.",t:ago(38)},
+      {id:"HS4798",cust:"Sade B.",addr:"6 Mobolaji Bank Anthony Way",items:[{n:"Paracetamol 500mg",q:1,p:600},{n:"Vitamin C 1000mg",q:2,p:1800}],rx:0,st:"done",t:ago(95)},
+      {id:"HS4790",cust:"Musa I.",addr:"40 Ikorodu Road",items:[{n:"Loratadine 10mg",q:2,p:1500}],rx:0,st:"done",t:ago(140)}]:[];
+    X.consults=D?[
+      {id:"C301",who:"Chioma P.",mode:"Video",slot:"2:00 PM",fee:fees.Video||2000,st:"confirmed"},
+      {id:"C302",who:"Kayode R.",mode:"Chat",slot:"3:30 PM",fee:fees.Chat||1000,st:"confirmed"},
+      {id:"C299",who:"Aisha L.",mode:"Voice",slot:"11:00 AM",fee:fees.Voice||1500,st:"completed"}]:[];
+  }else{
+    X.open24=!!d.em;X.amb=!!d.amb;X.line=d.emPhone||d.phone||"";
+    X.docs=(S.docs||[]).filter(function(x){return x.n&&x.n.trim()}).map(function(x){return {n:x.n.trim(),s:(x.s||"").trim(),m:(x.m||"").trim(),on:1,off:[]}});
+    var A="Dr. Adeyemi – GP",O="Dr. Okafor – Paediatrics";
+    X.bookings=D?[
+      {id:"BK3310",pat:"Tola A.",doc:A,mode:"Video",slot:"9:00 AM",fee:fees.Video,st:"completed",t:ago(240)},
+      {id:"BK3311",pat:"Peter K.",doc:O,mode:"In person",slot:"10:30 AM",fee:fees["In person"],st:"inprogress",t:ago(200)},
+      {id:"BK3312",pat:"Zainab M.",doc:A,mode:"Chat",slot:"12:00 PM",fee:fees.Chat,st:"confirmed",t:ago(120)},
+      {id:"BK3313",pat:"Sola B.",doc:O,mode:"Video",slot:"2:00 PM",fee:fees.Video,st:"confirmed",t:ago(60)},
+      {id:"BK3314",pat:"Obi C.",doc:A,mode:"In person",slot:"4:00 PM",fee:fees["In person"],st:"confirmed",t:ago(30)}]:[];
+    X.alerts=D?[{id:"E901",who:"A patient shared their location",km:2.1,ph:"+2348000000099",st:"new",t:ago(2)}]:[];
+  }
+  return X;
+}
+function pLoad(){try{P=JSON.parse(localStorage.getItem(PK)||"null")}catch(e){P=null}if(!P||P.type!==S.type){P=pInit();pLocal()}if(!P.fees)P.fees={}}
+
+/* ----- pull customer orders and visits that were sent to this business; keep their status in sync ----- */
+function pull(){
+  var id=pid(),fresh=[];
+  if(S.type==="pharm"){
+    HS.orders(function(o){return o.pid===id}).forEach(function(o){
+      var x=ord(o.id);
+      if(!x){P.orders.unshift({id:o.id,cust:o.name||"Customer",phone:o.phone,addr:o.addr,items:o.items,rx:o.rx?1:0,rxOk:false,rxName:o.rxName,st:o.st,t:o.t,rider:o.rider,ext:1});fresh.push("order "+o.id)}
+      else if(x.ext&&(x.st!==o.st||x.rider!==o.rider)){x.st=o.st;x.rider=o.rider}
+    });
+    HS.visits(function(v){return v.pid===id}).forEach(function(v){
+      var c=cons(v.id);
+      if(!c){P.consults.unshift({id:v.id,who:v.pat||"Customer",mode:v.mode,slot:v.slot||"Now",fee:v.fee,st:v.st,ext:1,t:v.t});fresh.push("consultation "+v.id)}
+      else if(c.ext)c.st=v.st;
+    });
+  }else{
+    HS.visits(function(v){return v.pid===id}).forEach(function(v){
+      var b=bk(v.id);
+      if(!b){P.bookings.push({id:v.id,pat:v.pat||"Patient",doc:v.doc||"",mode:v.mode,slot:v.slot||null,fee:v.fee,st:v.st,kind:v.kind,hn:v.hn,phone:v.phone,src:v.src,t:v.t,ext:1});fresh.push((v.kind==="reg"?"registration ":v.kind==="ticket"?"ticket ":"booking ")+v.id)}
+      else if(b.ext)b.st=v.st;
+    });
+  }
+  if(fresh.length)pLocal();
+  return fresh;
+}
+function mo(o){if(o.ext)HS.setOrder(o.id,{st:o.st,rider:o.rider||"",t2:Date.now()})}
+function mv(id,st){HS.setVisit(id,{st:st})}
+
+function tabs(){return S.type==="pharm"?[{id:"orders",l:"Orders",i:"orders"},{id:"stock",l:"Stock",i:"stock"},{id:"cons",l:"Consults",i:"chat"},{id:"earn",l:"Earnings",i:"wallet"}]:[{id:"book",l:"Visits",i:"cal"},{id:"docs",l:"Doctors",i:"user"},{id:"earn",l:"Earnings",i:"wallet"}]}
+function bd(id){
+  if(id==="orders")return P.orders.filter(function(o){return o.st==="new"}).length;
+  if(id==="stock")return P.stock.filter(function(s){return s.q<=10}).length;
+  if(id==="cons")return P.consults.filter(function(c){return c.st==="confirmed"}).length;
+  if(id==="book")return P.alerts.filter(function(a){return a.st==="new"}).length+P.bookings.filter(function(b){return b.st==="confirmed"&&b.ext}).length;
+  return 0;
+}
+
+/* ----- views ----- */
+var OST={"new":["New","tag"],preparing:["Preparing","tag rx"],ready:["Ready for rider","tag"],out:["With rider","tag"],done:["Delivered","tag gr"],rejected:["Declined","tag red"]};
+function ogrp(o){return o.st==="new"?"new":(o.st==="done"||o.st==="rejected")?"done":"act"}
+function oCard(o){
+  var st=OST[o.st],id=' data-i="'+esc(o.id)+'"',A="";
+  if(o.st==="new")A='<button class="btn out" data-a="dec"'+id+'>Decline</button>'+((o.rx&&!o.rxOk)?'<button class="btn" data-a="rx"'+id+'>Check prescription</button>':'<button class="btn" data-a="acc"'+id+'>Accept order</button>');
+  else if(o.st==="preparing")A='<button class="btn" data-a="rdy"'+id+'>Mark ready for rider</button>';
+  else if(o.st==="ready")A='<button class="btn" data-a="out"'+id+'>Hand to rider'+(o.rider?" ("+esc(o.rider)+")":"")+'</button>';
+  else if(o.st==="out")A='<button class="btn" data-a="dlv"'+id+'>Mark delivered</button>';
+  return '<div class="card"><div class="r"><div><div class="t">Order '+esc(o.id)+'</div><div class="s">'+esc(o.cust)+' · '+since(o.t)+'</div></div><span class="'+st[1]+'">'+st[0]+'</span></div>'+
+    '<div class="s" style="margin:8px 0">'+o.items.map(function(i){return i.q+"× "+esc(i.n)}).join(", ")+'</div>'+
+    (o.addr?'<div class="s" style="margin-bottom:8px">📍 '+esc(o.addr)+(o.phone?' · '+esc(o.phone):'')+'</div>':'')+
+    '<div class="r"><b>'+naira(osub(o))+'</b>'+(o.rx?'<span class="tag rx">'+(o.rxOk?"Prescription verified":"Prescription to verify")+'</span>':'')+'</div>'+(A?'<div class="acts">'+A+'</div>':'')+'</div>';
+}
+function vOrders(){
+  var n={"new":0,act:0,done:0};P.orders.forEach(function(o){n[ogrp(o)]++});
+  var h='<div class="card"><div class="r"><div><div class="t">'+(P.online?"You are online":"You are offline")+'</div><div class="s">'+(P.online?"Customers can order from you.":"Switch on to start receiving orders.")+'</div></div>'+sw("online",P.online,"Online")+'</div></div>'+
+    chipsH("of",[["new","New ("+n["new"]+")"],["act","Active ("+n.act+")"],["done","Done ("+n.done+")"]],OF);
+  var l=P.orders.filter(function(o){return ogrp(o)===OF});
+  return h+(l.length?lst(l.map(oCard).join("")):empty(P.orders.length?"Nothing here right now.":"No orders yet. Orders from customers appear here once you are online."));
+}
+function vStock(){
+  var low=function(s){return s.q>0&&s.q<=10};
+  var l=P.stock.filter(function(s){return SF==="all"||(SF==="low"&&low(s))||(SF==="out"&&s.q<=0)});
+  var h='<button class="btn" data-a="sadd" style="margin:0 0 12px">+ Add medicine</button>'+chipsH("sf",[["all","All ("+P.stock.length+")"],["low","Low ("+P.stock.filter(low).length+")"],["out","Out ("+P.stock.filter(function(s){return s.q<=0}).length+")"]],SF);
+  return h+(l.length?lst(l.map(function(s){
+    return '<div class="card"><div class="r"><div><div class="t">'+esc(s.n)+'</div><div class="s">'+esc(s.k)+' · '+esc(s.c)+'</div></div><b>'+naira(s.p)+'</b></div>'+
+      '<div style="margin-top:8px">'+(s.q<=0?'<span class="tag red">Out of stock</span>':low(s)?'<span class="tag rx">Low: '+s.q+' left</span>':'<span class="tag">'+s.q+' in stock</span>')+(s.rx?' <span class="tag rx">Prescription</span>':'')+'</div>'+
+      '<div class="r" style="margin-top:12px"><span class="s" style="font-weight:600;color:var(--ink)">Show to customers</span>'+sw("stog",s.on&&s.q>0,"Show "+esc(s.n),s.id)+'<button class="btn out sm" data-a="sedit" data-i="'+s.id+'">Edit</button></div></div>'
+  }).join("")):empty(P.stock.length?"Nothing matches this filter.":"Add your first medicine to start selling."));
+}
+var CST={confirmed:["Upcoming","tag"],inprogress:["In progress","tag rx"],completed:["Completed","tag gr"]};
+function vCons(){
+  var rank={inprogress:0,confirmed:1,completed:2};
+  var l=P.consults.slice().sort(function(a,b){return (rank[a.st]||1)-(rank[b.st]||1)});
+  return (l.length?lst(l.map(function(c){
+    var A="",id=' data-i="'+esc(c.id)+'"';
+    if(c.st==="confirmed")A=WEB?'<button class="btn" data-a="cdone"'+id+'>Mark completed</button>':'<button class="btn" data-a="cstart"'+id+'>Start '+esc(c.mode.toLowerCase())+' consultation</button>';
+    else if(c.st==="inprogress")A=(WEB?'':'<button class="btn out" data-a="croom"'+id+'>Rejoin room</button>')+'<button class="btn" data-a="cdone"'+id+'>Mark completed</button>';
+    var s=CST[c.st]||CST.confirmed;
+    return '<div class="card"><div class="r"><div><div class="t">'+esc(c.who)+'</div><div class="s">'+esc(c.mode)+' consultation · '+(c.slot==="Now"?"Now":"Today, "+esc(c.slot))+'</div></div><span class="'+s[1]+'">'+s[0]+'</span></div>'+
+      '<div class="r" style="margin-top:8px"><span class="s">Paid in app</span><b>'+naira(c.fee)+'</b></div>'+(A?'<div class="acts">'+A+'</div>':'')+'</div>'
+  }).join("")):empty("No consultations yet. Patients can book video, voice or chat time with your pharmacists in the app."));
+}
+var BST={confirmed:["Confirmed","tag"],inprogress:["In progress","tag rx"],completed:["Completed","tag gr"],noshow:["No-show","tag red"]};
+function slotTxt(b){return b.slot?b.slot==="Now"?"Now":b.slot:b.kind==="reg"?"New patient registration":"Walk-in ticket"}
+function vBook(){
+  var h='<div class="card"><div class="r"><div><div class="t">Emergency line</div><div class="s">'+(P.line?esc(P.line):"Not set")+'</div></div><span class="tag'+(P.open24?'':' red')+'">'+(P.open24?"Open 24/7":"Day hours")+'</span></div>'+
+    '<div class="r" style="margin-top:12px"><span class="s" style="font-weight:600;color:var(--ink)">Open 24/7 for emergencies</span>'+sw("t24",P.open24,"Open 24/7")+'</div>'+
+    '<div class="r" style="margin-top:10px"><span class="s" style="font-weight:600;color:var(--ink)">Ambulance available</span>'+sw("tamb",P.amb,"Ambulance available")+'</div></div>';
+  P.alerts.filter(function(a){return a.st!=="done"}).forEach(function(a){
+    h+='<div class="alert"><div class="r"><div class="t" style="color:var(--red)">🚨 Emergency alert</div><span class="s">'+since(a.t)+'</span></div><div style="margin:6px 0 2px">'+esc(a.who)+' · '+a.km+' km away</div>'+
+      '<div class="acts">'+(a.st==="new"?'<button class="btn red" data-a="ack" data-i="'+a.id+'">Acknowledge</button><a class="btn out" href="tel:'+esc(a.ph)+'">📞 Call</a>':
+      (P.amb?'<button class="btn red" data-a="amb" data-i="'+a.id+'">Dispatch ambulance</button>':'')+'<button class="btn out" data-a="res" data-i="'+a.id+'">Resolved</button>')+'</div></div>';
+  });
+  var up=function(b){return b.st==="confirmed"||b.st==="inprogress"};
+  var l=P.bookings.filter(function(b){return (BF==="up")===up(b)}).sort(function(a,b){return TIMES.indexOf(a.slot)-TIMES.indexOf(b.slot)});
+  h+='<h2 style="margin:6px 0 10px;font-size:17px">Today</h2>'+chipsH("bf",[["up","Upcoming ("+P.bookings.filter(up).length+")"],["done","Finished ("+P.bookings.filter(function(b){return !up(b)}).length+")"]],BF);
+  return h+(l.length?lst(l.map(function(b){
+    var live=HS.isLive(b.mode),id=' data-i="'+esc(b.id)+'"',A="";
+    if(b.st==="confirmed"){
+      if(live&&WEB)A='<div class="s" style="flex:1;align-self:center">Live calls run in the Hospiswift app.</div>';
+      else A='<button class="btn out" data-a="bns"'+id+'>No-show</button><button class="btn" data-a="bst"'+id+'>'+(live?"Start "+esc(b.mode.toLowerCase()):"Check in")+'</button>';
+    }else if(b.st==="inprogress")A=(live&&!WEB?'<button class="btn out" data-a="broom"'+id+'>Rejoin room</button>':'')+'<button class="btn" data-a="bdone"'+id+'>Mark completed</button>';
+    return '<div class="card"><div class="r"><div><div class="t">'+esc(b.pat)+'</div><div class="s">'+esc(b.doc||(b.kind==="reg"?"Hospital number "+esc(b.hn||""):"Any available doctor"))+'</div></div><span class="'+BST[b.st][1]+'">'+BST[b.st][0]+'</span></div>'+
+      '<div class="r" style="margin-top:8px"><span class="s">'+esc(b.mode)+' · '+esc(slotTxt(b))+(b.src==="web"?' · Website':'')+'</span><b>'+naira(b.fee)+' paid</b></div>'+
+      (b.phone?'<div class="s" style="margin-top:4px">📞 '+esc(b.phone)+(b.hn&&b.kind!=="reg"?' · No. '+esc(b.hn):'')+'</div>':'')+(A?'<div class="acts">'+A+'</div>':'')+'</div>'
+  }).join("")):empty(P.bookings.length?"Nothing here right now.":"No visits yet. Patients can book, register and pay once your doctors have open slots and your fees are set."));
+}
+function slotBtn(d,i,t){
+  var b=P.bookings.some(function(x){return x.doc===dl(d)&&x.slot===t&&x.st!=="noshow"}),off=d.off.indexOf(t)>-1;
+  return '<button class="slotb '+(b?"bk":off?"off":"on")+'"'+(b?' disabled':'')+' data-a="slot" data-i="'+i+'|'+t+'">'+t+(b?'<small>Booked</small>':'')+'</button>';
+}
+function vDocs(){
+  var h='<button class="btn" data-a="dadd" style="margin:0 0 12px">+ Add doctor</button>';
+  return h+(P.docs.length?lst(P.docs.map(function(d,i){
+    return '<div class="card"><div class="r"><div><div class="t">'+esc(d.n)+'</div><div class="s">'+esc(d.s||"General")+(d.m?" · "+esc(d.m):"")+'</div></div>'+sw("dtog",d.on,"Accepting bookings: "+esc(d.n),i)+'</div>'+
+      '<div class="s" style="margin-top:10px">'+(d.on?"Tap a time to open or block it today.":"Not accepting bookings")+'</div>'+
+      (d.on?'<div class="sl">'+TIMES.map(function(t){return slotBtn(d,i,t)}).join("")+'</div>':'')+
+      (P.docs.length>1?'<button class="rm" data-a="ddel" data-i="'+i+'">Remove doctor</button>':'')+'</div>'
+  }).join("")):empty("Add at least one doctor patients can book."));
+}
+function vEarn(){
+  var ph=S.type==="pharm",today=0,cnt=0;
+  if(ph){P.orders.forEach(function(o){if(o.st==="done"){today+=osub(o);cnt++}});P.consults.forEach(function(c){if(c.st==="completed"){today+=c.fee;cnt++}})}
+  else P.bookings.forEach(function(b){if(b.st==="completed"){today+=b.fee;cnt++}});
+  var a=P.pay.acct,keys=Object.keys(P.fees);
+  var h='<div class="grid2"><div class="stat"><span class="s">'+(ph?"Sales today":"Earned today")+'</span><b>'+naira(today)+'</b></div><div class="stat"><span class="s">'+(ph?"Completed today":"Visits completed")+'</span><b>'+cnt+'</b></div>'+
+    '<div class="stat"><span class="s">Pending payout</span><b>'+naira(today+P.carry)+'</b></div><div class="stat"><span class="s">Last payout</span><b>'+(P.last?naira(P.last):"—")+'</b></div></div>'+
+    '<div class="card" style="margin-top:12px"><div class="t">Payout account</div><div class="s" style="margin-top:4px">'+(a?esc(P.pay.bank)+" · ····"+esc(a.slice(-4))+"<br>"+esc(P.pay.name):"Not set")+'</div><div class="s" style="margin-top:6px">Paid out weekly.</div></div>'+
+    '<div class="card"><div class="t">'+(ph?"Consultation fees":"Appointment fees")+'</div><div class="s" style="margin:4px 0 12px">You set the price for each appointment type. Patients pay it through the payment gateway before the booking or consultation is confirmed.</div>'+
+    keys.map(function(k,i){return '<div class="f"><label for="fe'+i+'">'+esc(HS.label(k))+' (₦)</label><div class="r"><input id="fe'+i+'" type="text" inputmode="numeric" data-fk="'+esc(k)+'" value="'+P.fees[k]+'" autocomplete="off">'+(!ph&&keys.length>1?'<button class="rm" style="margin:0" data-a="fdel" data-i="'+i+'" aria-label="Remove '+esc(HS.label(k))+'">Remove</button>':'')+'</div></div>'}).join("")+
+    (keys.length?'<button class="btn" data-a="fsave">Save fees</button>':empty("No fees set."));
+  if(!ph){
+    var free=HS.TYPES.filter(function(t){return !(t in P.fees)});
+    h+='<div class="s" style="margin:14px 0 6px;font-weight:700;color:var(--ink)">Add an appointment type</div><div class="f"><label for="nt">Type (pick one or type your own, e.g. Dental check)</label><input id="nt" type="text" list="ntl" autocomplete="off" placeholder="e.g. Specialist"><datalist id="ntl">'+free.map(function(t){return '<option value="'+esc(t)+'">'+esc(HS.label(t))+'</option>'}).join("")+'</datalist></div>'+
+      '<div class="f"><label for="nf">Fee (₦)</label><input id="nf" type="text" inputmode="numeric" placeholder="e.g. 8000" autocomplete="off"></div><button class="btn out" data-a="fadd">Add type</button>';
+  }
+  h+='</div>';
+  if(DEMO)h+='<button class="btn out" data-a="reset">Reset demo data</button><p class="note">Demo data lives on this device only.</p>';
+  return h;
+}
+
+/* ----- sheets ----- */
+function openSh(h){$("#psh").innerHTML=h;$("#psh").classList.add("on");$("#sbg").classList.add("on");SH=true}
+function closeSh(){var p=$("#psh");if(!p)return;p.classList.remove("on");p.innerHTML="";$("#sbg").classList.remove("on");SH=false}
+function serr(m){var e=$("#serr");if(e){e.textContent=m;e.hidden=false}}
+function stockSheet(id){
+  var s=id?stkId(id):{n:"",c:"Other",k:"",p:"",q:"",rx:0};
+  openSh('<h3 style="margin-bottom:12px">'+(id?"Edit medicine":"Add medicine")+'</h3>'+
+   '<div class="f"><label for="sn">Name and strength</label><input id="sn" type="text" value="'+esc(s.n)+'" placeholder="e.g. Paracetamol 500mg"></div>'+
+   '<div class="f"><label for="sc">Category</label><select id="sc">'+CATS.map(function(c){return '<option'+(c===s.c?' selected':'')+'>'+c+'</option>'}).join("")+'</select></div>'+
+   '<div class="f"><label for="sk">Pack size</label><input id="sk" type="text" value="'+esc(s.k)+'" placeholder="e.g. Pack of 20"></div>'+
+   '<div class="row"><div class="f"><label for="sp">Price (₦)</label><input id="sp" type="text" inputmode="numeric" value="'+esc(s.p)+'"></div><div class="f"><label for="sq">In stock</label><input id="sq" type="text" inputmode="numeric" value="'+esc(s.q)+'"></div></div>'+
+   '<div class="f"><label class="chk"><input type="checkbox" id="srx"'+(s.rx?' checked':'')+'><span>Needs a prescription</span></label></div>'+
+   '<div class="msg" id="serr" role="alert" hidden></div>'+
+   '<div class="row"><button class="btn out" data-a="x">Cancel</button><button class="btn" data-a="ssave" data-i="'+(id||"")+'">Save</button></div>'+
+   (id?'<button class="btn out" style="color:var(--red);border-color:var(--red)" data-a="sdel" data-i="'+id+'">Remove from catalogue</button>':''));
+}
+function docSheet(){
+  openSh('<h3 style="margin-bottom:12px">Add doctor</h3>'+
+   '<div class="f"><label for="dn">Doctor name</label><input id="dn" type="text" placeholder="e.g. Dr. Ngozi Eze"></div>'+
+   '<div class="f"><label for="dm">MDCN number</label><input id="dm" type="text"></div>'+
+   '<div class="f"><label for="ds">Specialty</label><input id="ds" type="text" placeholder="e.g. Paediatrics"></div>'+
+   '<div class="msg" id="serr" role="alert" hidden></div>'+
+   '<div class="row"><button class="btn out" data-a="x">Cancel</button><button class="btn" data-a="dsave">Add doctor</button></div>');
+}
+
+/* ----- consultation rooms (app only) ----- */
+function loadRoom(cb){if(window.HS_ROOM)return cb();var s=document.createElement("script");s.src="hs-room.js";s.onload=cb;s.onerror=function(){toast("Could not load the consultation room")};document.head.appendChild(s)}
+function openRoom(id,mode,name){loadRoom(function(){HS_ROOM.open({id:id,role:"host",mode:mode,name:name})})}
+
+/* ----- actions ----- */
+function onClick(e){var b=e.target.closest("[data-a]");if(b&&!b.disabled)act(b.dataset.a,b.dataset.i)}
+function setO(o,st,msg){o.st=st;mo(o);pSave();draw();if(msg)toast(msg)}
+function act(a,i){
+  var o,b,c,d,s,v,p;
+  switch(a){
+  case "tab":TB=i;draw();scrollTo(0,0);return;
+  case "of":OF=i;draw();return;
+  case "sf":SF=i;draw();return;
+  case "bf":BF=i;draw();return;
+  case "x":closeSh();return;
+  case "online":P.online=!P.online;pSave();draw();toast(P.online?"You are online":"You are offline");return;
+  case "rx":o=ord(i);openSh('<h3 style="margin-bottom:12px">Prescription · '+esc(o.id)+'</h3><div class="card"><div class="t">📄 '+esc(o.rxName||("prescription-"+o.id+".jpg"))+'</div><div class="s" style="margin-top:6px">Check the patient name, drug, dose and prescriber details before you approve.</div></div><div class="row"><button class="btn out" data-a="rxno" data-i="'+esc(o.id)+'">Reject</button><button class="btn" data-a="rxok" data-i="'+esc(o.id)+'">Approve</button></div>');return;
+  case "rxok":ord(i).rxOk=true;closeSh();pSave();draw();toast("Prescription approved");return;
+  case "rxno":closeSh();setO(ord(i),"rejected","Order declined");return;
+  case "acc":
+    o=ord(i);
+    v=o.items.filter(function(it){var x=stk(it.n);return x&&x.q<it.q})[0];
+    if(v){toast("Not enough "+v.n+" in stock");return}
+    o.items.forEach(function(it){var x=stk(it.n);if(x)x.q-=it.q});
+    setO(o,"preparing","Order accepted. Start preparing");return;
+  case "dec":setO(ord(i),"rejected","Order declined");return;
+  case "rdy":o=ord(i);o.rider=pick(RIDERS);setO(o,"ready","Rider "+o.rider+" is coming to collect");return;
+  case "out":setO(ord(i),"out","Handed to rider");return;
+  case "dlv":setO(ord(i),"done","Order delivered");return;
+  case "stog":s=stkId(i);s.on=s.on?0:1;pSave();draw();return;
+  case "sadd":stockSheet("");return;
+  case "sedit":stockSheet(i);return;
+  case "ssave":
+    var nm=$("#sn").value.trim(),pr=$("#sp").value.replace(/[\s,]/g,""),qt=$("#sq").value.replace(/[\s,]/g,"");
+    if(!nm)return serr("Enter the medicine name.");
+    if(!/^\d{2,7}$/.test(pr))return serr("Enter the price in naira, e.g. 1500.");
+    if(!/^\d{1,5}$/.test(qt))return serr("Enter how many you have in stock.");
+    s=i?stkId(i):null;
+    if(!s){s={id:P.stock.reduce(function(m,x){return Math.max(m,x.id)},0)+1,on:1};P.stock.push(s)}
+    s.n=nm;s.c=$("#sc").value;s.k=$("#sk").value.trim();s.p=+pr;s.q=+qt;s.rx=$("#srx").checked?1:0;
+    closeSh();pSave();draw();toast(i?"Medicine updated":"Medicine added");return;
+  case "sdel":P.stock=P.stock.filter(function(x){return String(x.id)!==String(i)});closeSh();pSave();draw();toast("Removed from catalogue");return;
+  case "cstart":c=cons(i);c.st="inprogress";mv(c.id,"inprogress");pSave();draw();openRoom(c.id,c.mode,c.who);return;
+  case "croom":c=cons(i);openRoom(c.id,c.mode,c.who);return;
+  case "cdone":c=cons(i);c.st="completed";mv(c.id,"completed");pSave();draw();toast("Consultation completed");return;
+  case "t24":P.open24=!P.open24;pSave();draw();return;
+  case "tamb":P.amb=!P.amb;pSave();draw();return;
+  case "ack":P.alerts.filter(function(x){return x.id===i})[0].st="ack";pLocal();draw();toast("Patient notified that help is coming");return;
+  case "amb":toast("Ambulance dispatched");return;
+  case "res":P.alerts.filter(function(x){return x.id===i})[0].st="done";pLocal();draw();return;
+  case "bst":b=bk(i);b.st="inprogress";mv(b.id,"inprogress");pSave();draw();if(HS.isLive(b.mode)&&!WEB)openRoom(b.id,b.mode,b.pat);else toast("Patient checked in");return;
+  case "broom":b=bk(i);openRoom(b.id,b.mode,b.pat);return;
+  case "bdone":b=bk(i);b.st="completed";mv(b.id,"completed");pSave();draw();toast("Visit completed");return;
+  case "bns":b=bk(i);b.st="noshow";mv(b.id,"noshow");pSave();draw();return;
+  case "dtog":d=P.docs[+i];d.on=d.on?0:1;pSave();draw();return;
+  case "slot":p=i.split("|");d=P.docs[+p[0]];v=d.off.indexOf(p[1]);if(v>-1)d.off.splice(v,1);else d.off.push(p[1]);pSave();draw();return;
+  case "dadd":docSheet();return;
+  case "dsave":
+    if(!$("#dn").value.trim()||!$("#dm").value.trim()||!$("#ds").value.trim())return serr("Add the doctor's name, MDCN number and specialty.");
+    P.docs.push({n:$("#dn").value.trim(),m:$("#dm").value.trim(),s:$("#ds").value.trim(),on:1,off:[]});closeSh();pSave();draw();toast("Doctor added");return;
+  case "ddel":P.docs.splice(+i,1);pSave();draw();return;
+  case "fsave":
+    var inp=document.querySelectorAll("[data-fk]"),nf={},ok=true;
+    inp.forEach(function(el){var n=el.value.replace(/[\s,]/g,"");if(/^\d{3,7}$/.test(n))nf[el.dataset.fk]=+n;else ok=false});
+    if(!ok){toast("Enter amounts in naira, e.g. 5000");return}
+    for(var k in nf)P.fees[k]=nf[k];pSave();toast("Fees updated. Patients now pay these amounts");return;
+  case "fadd":
+    var tn=$("#nt").value.trim().replace(/\s+/g," "),tf=$("#nf").value.replace(/[\s,]/g,"");
+    var std=HS.TYPES.filter(function(t){return t.toLowerCase()===tn.toLowerCase()})[0];if(std)tn=std;
+    if(!/^[A-Za-z][A-Za-z0-9 &'\/-]{1,29}$/.test(tn)){toast("Enter a type name, e.g. Dental check");return}
+    if(Object.keys(P.fees).some(function(k){return k.toLowerCase()===tn.toLowerCase()})){toast(tn+" is already in your list");return}
+    if(!/^\d{3,7}$/.test(tf)){toast("Enter the fee in naira, e.g. 8000");return}
+    P.fees[tn]=+tf;pSave();draw();toast(tn+" added at "+naira(+tf));return;
+  case "fdel":
+    var fk=Object.keys(P.fees)[+i];if(fk&&Object.keys(P.fees).length>1){delete P.fees[fk];pSave();draw();toast(fk+" removed")}return;
+  case "reset":
+    try{localStorage.removeItem(PK)}catch(e){}
+    var ff=HS.get("hs_fees",{});delete ff[pid()];HS.put("hs_fees",ff);var ss=HS.get("hs_stock",{});delete ss[pid()];HS.put("hs_stock",ss);
+    P=null;simN=0;OF="new";SF="all";BF="up";pLoad();pull();pPublish();TB=tabs()[0].id;draw();toast("Demo data reset");return;
+  }
+}
+
+/* ----- demo: extra orders and bookings arrive while you watch ----- */
+function simOrder(){
+  var av=P.stock.filter(function(s){return s.on&&s.q>0});if(!av.length)return "";
+  var a=pick(av),b=pick(av),items=[{n:a.n,q:1,p:a.p}];if(b!==a)items.push({n:b.n,q:1,p:b.p});
+  var o={id:oid("HS"),cust:pick(NAMES),addr:"Ikeja, Lagos",items:items,rx:(a.rx||b.rx)?1:0,rxOk:false,st:"new",t:Date.now()};
+  P.orders.unshift(o);return o.id;
+}
+function simBooking(){
+  var modes=["Video","Voice","Chat","In person"].filter(function(m){return P.fees[m]}),free=[];
+  P.docs.forEach(function(d){if(!d.on)return;TIMES.forEach(function(t){if(d.off.indexOf(t)<0&&!P.bookings.some(function(b){return b.doc===dl(d)&&b.slot===t&&b.st!=="noshow"}))free.push([d,t])})});
+  if(!free.length||!modes.length)return "";
+  var f=pick(free),m=pick(modes),b={id:oid("BK"),pat:pick(NAMES),doc:dl(f[0]),mode:m,slot:f[1],fee:P.fees[m],st:"confirmed",t:Date.now()};
+  P.bookings.push(b);return b.id;
+}
+function startSim(){
+  if(!DEMO||simT)return;
+  simT=setTimeout(function tick(){
+    var ph=S.type==="pharm";
+    if(simN<3&&(!ph||P.online)){
+      var id=ph?simOrder():simBooking();
+      if(id){simN++;pLocal();toast((ph?"New order ":"New booking ")+id);refresh()}
+    }
+    if(simN<3)simT=setTimeout(tick,30000);
+  },9000);
+}
+function refresh(){var ae=document.activeElement;if($("#pv")&&!SH&&!(ae&&/INPUT|SELECT/.test(ae.tagName)))draw()}
+
+function tabNav(){
+  return '<nav class="tabs" aria-label="Sections">'+tabs().map(function(t){var n=bd(t.id);return '<button class="'+(t.id===TB?"on":"")+'" data-a="tab" data-i="'+t.id+'">'+svg(t.i)+t.l+(n?'<span class="bd">'+n+'</span>':'')+'</button>'}).join("")+'</nav>';
+}
+function draw(){
+  var v={orders:vOrders,stock:vStock,cons:vCons,earn:vEarn,book:vBook,docs:vDocs}[TB];
+  $("#app").innerHTML='<div id="pv">'+v()+'</div>'+tabNav();
+}
+function dash(){
+  theme();if(!P)pLoad();
+  $("#app").classList.add("tp");$("#bar").style.display="none";
+  $("#hp").textContent=(DEMO?"Demo account · ":"")+(S.d.name||flow().label);
+  if(!tabs().some(function(t){return t.id===TB}))TB=tabs()[0].id;
+  if(!$("#psh")){document.body.insertAdjacentHTML("beforeend",'<div class="sheetbg" id="sbg"></div><div class="psheet" id="psh" role="dialog" aria-modal="true"></div>');$("#sbg").onclick=closeSh;$("#psh").onclick=onClick}
+  $("#app").onclick=onClick;
+  var fresh=pull();pPublish();
+  HS.beat(pid());if(!beatT)beatT=setInterval(function(){HS.beat(pid())},5000);
+  if(!hooked){hooked=true;HS.onChange(function(){var f=pull();if(f.length){toast("New "+f[0]);refresh()}})}
+  draw();startSim();
+  if(fresh.length)toast("New "+fresh[0]);
+}
+
 
 render();
 })();

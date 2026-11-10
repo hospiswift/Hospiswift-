@@ -1,0 +1,188 @@
+/* Hospiswift shared core.
+   Used by the app, the website and the partner dashboards.
+   It stands in for the backend: listings, partner-set fees, stock, orders, visits (bookings,
+   tickets, registrations) and profiles live in localStorage, so the customer side and the partner
+   dashboards talk to each other on one browser. For production, replace the "DATA LAYER" functions
+   with calls to your API and keep the same shapes. */
+(function (w) {
+  "use strict";
+  var HS = w.HS = { config: { paystackKey: "" } };
+
+  /* ===== DATA LAYER (swap for your API) ===== */
+  var MEM = {}, LS = true;
+  try { localStorage.setItem("hs__t", "1"); localStorage.removeItem("hs__t"); } catch (e) { LS = false; }
+  function rd(k) { try { return LS ? localStorage.getItem(k) : (MEM[k] == null ? null : MEM[k]); } catch (e) { return null; } }
+  function wr(k, s) { try { if (LS) localStorage.setItem(k, s); else MEM[k] = s; } catch (e) {} }
+  function get(k, d) { var s = rd(k); if (s == null) return d; try { return JSON.parse(s); } catch (e) { return d; } }
+  function put(k, v, quiet) { wr(k, JSON.stringify(v)); if (!quiet) wr("hs_ver", Date.now() + "." + Math.random()); }
+  function clone(o) { return JSON.parse(JSON.stringify(o)); }
+  HS.get = get; HS.put = put; HS.clone = clone;
+
+  /* ===== small helpers ===== */
+  HS.esc = function (s) { return String(s == null ? "" : s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); };
+  HS.naira = function (n) { return "₦" + Math.round(n).toLocaleString("en-NG"); };
+  HS.since = function (ts) { var m = Math.max(0, Math.round((Date.now() - ts) / 60000)); return m < 1 ? "Just now" : m < 60 ? m + " min ago" : Math.round(m / 60) + " h ago"; };
+  HS.newId = function (p, list) { var id; do { id = p + Math.floor(1000 + Math.random() * 9000); } while (list.some(function (x) { return x.id === id; })); return id; };
+  HS.TIMES = ["9:00 AM", "10:30 AM", "12:00 PM", "2:00 PM", "4:00 PM", "6:00 PM"];
+
+  /* ===== appointment types and fees ===== */
+  HS.LABEL = { "Video": "Video consultation", "Voice": "Voice call", "Chat": "Chat", "In person": "In-person visit", "Emergency": "Emergency consultation", "Follow-up": "Follow-up visit", "Specialist": "Specialist consultation", "Antenatal": "Antenatal or maternity visit", "Registration": "New patient registration" };
+  HS.TYPES = Object.keys(HS.LABEL);
+  HS.label = function (k) { return HS.LABEL[k] || k; };
+  HS.isLive = function (k) { return k === "Video" || k === "Voice" || k === "Chat"; };      /* live rooms: app only */
+  HS.webOk = function (k) { return !HS.isLive(k) && k !== "Emergency"; };                    /* offered on the website */
+
+  var BASE = [
+    { id: "p1", kind: "pharm", name: "HealthPlus Pharmacy", km: 1.2, eta: 25, rating: 4.8, open: "24 hrs", fees: { "Video": 2000, "Voice": 1500, "Chat": 1000 } },
+    { id: "p2", kind: "pharm", name: "MedPoint Pharmacy", km: 2.4, eta: 35, rating: 4.6, open: "8am – 10pm", fees: { "Video": 1800, "Voice": 1200, "Chat": 800 } },
+    { id: "p3", kind: "pharm", name: "Alpha Care Chemist", km: 3.1, eta: 40, rating: 4.5, open: "24 hrs", fees: { "Video": 2500, "Voice": 1800, "Chat": 1000 } },
+    { id: "p4", kind: "pharm", name: "GreenCross Pharmacy", km: 4.0, eta: 50, rating: 4.3, open: "7am – 9pm", fees: { "Video": 1500, "Voice": 1000, "Chat": 700 } },
+    { id: "h1", kind: "hosp", name: "Lagoon General Hospital", km: 1.8, type: "General", open24: true, rating: 4.6, phone: "+2348000000001", docs: ["Dr. Adeyemi – GP", "Dr. Okafor – Paediatrics"],
+      fees: { "Video": 8000, "Voice": 6000, "Chat": 4000, "In person": 10000, "Emergency": 15000, "Follow-up": 5000, "Specialist": 12000, "Antenatal": 9000, "Registration": 3000 } },
+    { id: "h2", kind: "hosp", name: "St. Mary Specialist Hospital", km: 3.2, type: "Specialist", open24: true, rating: 4.7, phone: "+2348000000002", docs: ["Dr. Bello – Cardiology", "Dr. Eze – Surgery"],
+      fees: { "Video": 12000, "Voice": 9000, "Chat": 6000, "In person": 15000, "Emergency": 25000, "Follow-up": 8000, "Specialist": 20000, "Registration": 5000 } },
+    { id: "h3", kind: "hosp", name: "Bright Future Maternity Centre", km: 4.5, type: "Maternity", open24: false, rating: 4.4, phone: "+2348000000003", docs: ["Dr. Ibrahim – Obstetrics", "Dr. Nwosu – Midwifery"],
+      fees: { "Video": 7000, "Voice": 5000, "Chat": 3000, "In person": 9000, "Emergency": 15000, "Follow-up": 4500, "Antenatal": 8000, "Registration": 2500 } },
+    { id: "h4", kind: "hosp", name: "CityCare Clinic", km: 2.1, type: "Clinic", open24: false, rating: 4.2, phone: "+2348000000004", docs: ["Dr. Balogun – GP", "Dr. Musa – Dental"],
+      fees: { "Video": 5000, "Voice": 4000, "Chat": 2500, "In person": 6000, "Emergency": 10000, "Follow-up": 3000, "Registration": 2000 } }
+  ];
+  var DEF_STOCK = [
+    { id: 1, n: "Paracetamol 500mg", c: "Pain & fever", k: "Pack of 20", p: 600, q: 99, rx: 0, on: 1 },
+    { id: 2, n: "Ibuprofen 400mg", c: "Pain & fever", k: "Pack of 10", p: 900, q: 99, rx: 0, on: 1 },
+    { id: 3, n: "Vitamin C 1000mg", c: "Vitamins", k: "Tube of 10", p: 1800, q: 99, rx: 0, on: 1 },
+    { id: 4, n: "ORS Sachets", c: "Stomach", k: "Box of 5", p: 1200, q: 99, rx: 0, on: 1 },
+    { id: 5, n: "Loratadine 10mg", c: "Allergy", k: "Pack of 10", p: 1500, q: 99, rx: 0, on: 1 },
+    { id: 6, n: "Amoxicillin 500mg", c: "Antibiotics", k: "Pack of 21", p: 3500, q: 99, rx: 1, on: 1 },
+    { id: 7, n: "Metformin 500mg", c: "Chronic care", k: "Pack of 30", p: 2800, q: 99, rx: 1, on: 1 },
+    { id: 8, n: "Amlodipine 5mg", c: "Chronic care", k: "Pack of 30", p: 3200, q: 99, rx: 1, on: 1 },
+    { id: 9, n: "Artemether/Lumefantrine", c: "Malaria", k: "Adult course", p: 2500, q: 99, rx: 0, on: 1 }
+  ];
+
+  /* ===== listings ===== */
+  function liveMap() { return get("hs_live", {}); }
+  function allBase() { var l = liveMap(); return BASE.concat(Object.keys(l).map(function (k) { return l[k]; })); }
+  function find(id) { return allBase().filter(function (x) { return x.id === id; })[0]; }
+  HS.fees = function (id) { var o = get("hs_fees", {}); if (o[id]) return clone(o[id]); var l = find(id); return l ? clone(l.fees || {}) : {}; };
+  HS.setFees = function (id, f) { var o = get("hs_fees", {}); o[id] = clone(f); put("hs_fees", o); };
+  HS.listing = function (id) { var l = find(id); if (!l) return null; l = clone(l); l.fees = HS.fees(id); return l; };
+  HS.listings = function (kind) { return allBase().filter(function (x) { return x.kind === kind; }).map(function (x) { return HS.listing(x.id); }); };
+  HS.pros = function (l) { return (l.docs && l.docs.length) ? l.docs : (l.kind === "hosp" ? [] : ["Pharm. A. Obi", "Pharm. K. Yusuf"]); };
+  HS.publish = function (l) { var m = liveMap(); m[l.id] = l; put("hs_live", m); };   /* real partners appear to customers */
+  HS.setAvail = function (id, m) { var a = get("hs_avail", {}); a[id] = clone(m); put("hs_avail", a); };   /* doctor availability: {label:{on,off:[times]}} */
+  HS.avail = function (id) { return get("hs_avail", {})[id] || null; };
+  HS.stock = function (id) { var s = get("hs_stock", {}); return s[id] ? clone(s[id]) : clone(DEF_STOCK); };
+  HS.setStock = function (id, arr) { var s = get("hs_stock", {}); s[id] = clone(arr); put("hs_stock", s); };
+
+  /* ===== orders and visits ===== */
+  HS.addOrder = function (o) { var a = get("hs_orders", []); o.id = o.id || HS.newId("HS", a); a.unshift(o); put("hs_orders", a.slice(0, 300)); return o; };
+  HS.orders = function (fn) { return get("hs_orders", []).filter(fn || function () { return true; }); };
+  HS.setOrder = function (id, patch) { var a = get("hs_orders", []), hit = null; a.forEach(function (o) { if (o.id === id) { for (var k in patch) o[k] = patch[k]; hit = o; } }); if (hit) put("hs_orders", a); return hit; };
+  HS.addVisit = function (v) { var a = get("hs_visits", []); v.id = v.id || HS.newId(v.kind === "ticket" ? "TK" : v.kind === "reg" ? "RG" : "BK", a); a.unshift(v); put("hs_visits", a.slice(0, 300)); return v; };
+  HS.visits = function (fn) { return get("hs_visits", []).filter(fn || function () { return true; }); };
+  HS.setVisit = function (id, patch) { var a = get("hs_visits", []), hit = null; a.forEach(function (o) { if (o.id === id) { for (var k in patch) o[k] = patch[k]; hit = o; } }); if (hit) put("hs_visits", a); return hit; };
+
+  /* ===== customer profile: name, address, favourite pharmacy and hospital, hospital numbers ===== */
+  HS.profile = function (phone) { return get("hs_prof", {})[phone] || null; };
+  HS.saveProfile = function (phone, p) { var m = get("hs_prof", {}); m[phone] = p; put("hs_prof", m); };
+  HS.hospitalNo = function (l) { var ini = l.name.replace(/[^A-Za-z ]/g, "").split(" ").filter(Boolean).map(function (x) { return x[0]; }).join("").toUpperCase().slice(0, 3); return ini + "-" + String(Math.floor(100000 + Math.random() * 900000)); };
+
+  /* ===== partner presence (a live dashboard beats every 5 s) ===== */
+  HS.beat = function (id) { var h = get("hs_hb", {}); h[id] = Date.now(); put("hs_hb", h, true); };
+  HS.alive = function (id) { return Date.now() - (get("hs_hb", {})[id] || 0) < 15000; };
+
+  /* ===== change notifications across tabs and frames ===== */
+  HS.onChange = function (cb) {
+    w.addEventListener("storage", function (e) { if (e.key === "hs_ver") cb(); });
+    var last = rd("hs_ver");
+    setInterval(function () { var v = rd("hs_ver"); if (v !== last) { last = v; cb(); } }, 3000);
+  };
+
+  /* ===== payment gateway =====
+     HS.pay({amount, title, email}) -> Promise of {ref, method, amount, at} or null if closed before paying.
+     Demo checkout by default (card, bank transfer, USSD). To go live with Paystack set
+     HS.config.paystackKey = "pk_live_..." and verify every transaction on your server before you
+     confirm an order or booking. */
+  function luhn(s) { var n = 0, alt = false; for (var i = s.length - 1; i >= 0; i--) { var d = +s[i]; if (alt) { d *= 2; if (d > 9) d -= 9; } n += d; alt = !alt; } return n % 10 === 0; }
+  var PCSS = ".hsp-bg{position:fixed;inset:0;background:rgba(10,25,20,.6);z-index:300;display:flex;align-items:flex-end;justify-content:center}" +
+    "@media(min-width:600px){.hsp-bg{align-items:center}}" +
+    ".hsp{background:#fff;color:#10231C;width:100%;max-width:440px;max-height:94vh;overflow:auto;border-radius:22px 22px 0 0;padding:18px 18px calc(18px + env(safe-area-inset-bottom,0px));font-family:inherit}" +
+    "@media(min-width:600px){.hsp{border-radius:22px}}" +
+    ".hsp-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}.hsp-x{width:34px;height:34px;border-radius:50%;background:#EEF3F0;font-size:15px;border:0;cursor:pointer}" +
+    ".hsp-amt{font-size:30px;font-weight:800;letter-spacing:-.5px}.hsp-amt span{display:block;font-size:13px;font-weight:600;color:#5D6F68;letter-spacing:0;margin-top:2px}" +
+    ".hsp-tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:14px 0}.hsp-tabs button{padding:10px 4px;border-radius:10px;border:1.5px solid #DCE6E1;background:#fff;font-weight:700;font-size:13px;cursor:pointer;font-family:inherit}" +
+    ".hsp-tabs button.on{background:var(--accent,var(--a,#0B7A55));border-color:var(--accent,var(--a,#0B7A55));color:#fff}" +
+    ".hsp-f{margin-bottom:12px;flex:1}.hsp-f label{display:block;font-weight:700;font-size:13px;margin-bottom:5px}" +
+    ".hsp-f input,.hsp-f select{width:100%;padding:13px;border:1.5px solid #DCE6E1;border-radius:12px;font:inherit;background:#fff;color:#10231C}" +
+    ".hsp-r{display:flex;gap:10px}.hsp-err{color:#D32F2F;font-weight:600;font-size:13px;margin:-4px 0 10px}" +
+    ".hsp-go{width:100%;padding:14px;border-radius:12px;border:0;background:var(--accent,var(--a,#0B7A55));color:#fff;font:inherit;font-weight:800;cursor:pointer}.hsp-go:disabled{opacity:.5}" +
+    ".hsp-box{background:#F2F7F4;border-radius:14px;padding:14px;margin-bottom:12px;font-size:14px;line-height:1.5}.hsp-box b{font-size:20px;letter-spacing:1px;display:block;margin:2px 0}" +
+    ".hsp-note{font-size:12px;color:#5D6F68;text-align:center;margin-top:12px}.hsp-hint{font-size:12px;color:#5D6F68;margin:-2px 0 12px}" +
+    ".hsp-ok{text-align:center;padding:10px 0}.hsp-ok i{display:grid;place-items:center;width:64px;height:64px;margin:0 auto 10px;border-radius:50%;background:#E3F4EC;color:#0B7A55;font-size:32px;font-style:normal}";
+  function pcss() { if (document.getElementById("hsp-css")) return; var s = document.createElement("style"); s.id = "hsp-css"; s.textContent = PCSS; document.head.appendChild(s); }
+  var BANKS = { "GTBank": "737", "Access Bank": "901", "UBA": "919", "Zenith Bank": "966", "First Bank": "894" };
+
+  HS.pay = function (o) {
+    return new Promise(function (resolve) {
+      var ref = "HSP" + Date.now().toString(36).toUpperCase().slice(-6) + Math.floor(10 + Math.random() * 90);
+      if (HS.config.paystackKey) { /* live gateway (not exercised in the demo) */
+        var go = function () { w.PaystackPop.setup({ key: HS.config.paystackKey, email: o.email || "customer@hospiswift.app", amount: Math.round(o.amount * 100), currency: "NGN", ref: ref,
+          callback: function (r) { resolve({ ref: r.reference, method: "paystack", amount: o.amount, at: Date.now() }); }, onClose: function () { resolve(null); } }).openIframe(); };
+        if (w.PaystackPop) return go();
+        var sc = document.createElement("script"); sc.src = "https://js.paystack.co/v1/inline.js"; sc.onload = go; sc.onerror = function () { resolve(null); }; document.head.appendChild(sc); return;
+      }
+      pcss();
+      var st = { m: "card", busy: false, done: null, bank: "GTBank", acct: String(Math.floor(1e9 + Math.random() * 9e9)) };
+      var bg = document.createElement("div"); bg.className = "hsp-bg";
+      bg.innerHTML = '<div class="hsp" role="dialog" aria-modal="true" aria-label="Payment"><div class="hsp-top"><b>Hospiswift Pay</b><button class="hsp-x" data-x aria-label="Close payment">✕</button></div>' +
+        '<div class="hsp-amt">' + HS.naira(o.amount) + '<span>' + HS.esc(o.title || "Payment") + '</span></div><div id="hspTabs"></div><div id="hspBody"></div><p class="hsp-note">Demo checkout. No money moves. Never enter a real card here.</p></div>';
+      document.body.appendChild(bg);
+      var prevFocus = document.activeElement;
+      function $(s) { return bg.querySelector(s); }
+      function close() { document.removeEventListener("keydown", key); bg.remove(); if (prevFocus && prevFocus.focus) try { prevFocus.focus(); } catch (e) {} resolve(st.done); }
+      function key(e) { if (e.key === "Escape" && !st.busy) close(); }
+      document.addEventListener("keydown", key);
+      function err(m) { var e = $("#hspErr"); if (e) { e.textContent = m; e.hidden = false; } }
+      function succeed(method) { st.busy = false; st.done = { ref: ref, method: method, amount: o.amount, at: Date.now() }; draw(); }
+      function busy(btn, msg, ms, then) { st.busy = true; btn.disabled = true; btn.textContent = msg; setTimeout(then, ms); }
+      function draw() {
+        $("#hspTabs").innerHTML = st.done ? "" : '<div class="hsp-tabs" role="tablist">' + [["card", "Card"], ["bank", "Bank transfer"], ["ussd", "USSD"]].map(function (t) { return '<button role="tab" aria-selected="' + (st.m === t[0]) + '" class="' + (st.m === t[0] ? "on" : "") + '" data-m="' + t[0] + '">' + t[1] + '</button>'; }).join("") + '</div>';
+        var h = "";
+        if (st.done) h = '<div class="hsp-ok" role="status"><i>✓</i><b style="font-size:20px">Payment successful</b><div class="hsp-hint" style="margin-top:6px">Reference ' + st.done.ref + ' · ' + ({ card: "Card", bank: "Bank transfer", ussd: "USSD" }[st.done.method] || st.done.method) + '</div></div><button class="hsp-go" data-cont>Continue</button>';
+        else if (st.m === "card") h = '<div class="hsp-f"><label for="hc-n">Card number</label><input id="hc-n" inputmode="numeric" autocomplete="off" maxlength="23" placeholder="0000 0000 0000 0000"></div>' +
+          '<div class="hsp-r"><div class="hsp-f"><label for="hc-e">Expiry</label><input id="hc-e" inputmode="numeric" autocomplete="off" maxlength="5" placeholder="MM/YY"></div><div class="hsp-f"><label for="hc-c">CVV</label><input id="hc-c" type="password" inputmode="numeric" autocomplete="off" maxlength="4" placeholder="123"></div></div>' +
+          '<div class="hsp-hint">Test card: 4084 0840 8408 4081 · any future date · CVV 408</div><div class="hsp-err" id="hspErr" role="alert" hidden></div><button class="hsp-go" data-card>Pay ' + HS.naira(o.amount) + '</button>';
+        else if (st.m === "bank") h = '<div class="hsp-box">Transfer exactly ' + HS.naira(o.amount) + ' to<b>' + st.acct + '</b>Wema Bank · Hospiswift Pay (demo account)<br>This account expires in 30 minutes.</div><button class="hsp-go" data-bank>I have sent the money</button>';
+        else h = '<div class="hsp-f"><label for="hu-b">Your bank</label><select id="hu-b">' + Object.keys(BANKS).map(function (b) { return '<option' + (b === st.bank ? " selected" : "") + '>' + b + '</option>'; }).join("") + '</select></div>' +
+          '<div class="hsp-box">Dial this code on your phone<b id="hspUssd">*' + BANKS[st.bank] + '*000*' + Math.round(o.amount) + '#</b>Then confirm with your PIN.</div><button class="hsp-go" data-ussd>I have paid</button>';
+        $("#hspBody").innerHTML = h;
+      }
+      bg.addEventListener("click", function (e) {
+        if (e.target === bg && !st.busy) return close();
+        var b = e.target.closest("button"); if (!b || b.disabled) return;
+        if (b.hasAttribute("data-x") && !st.busy) return close();
+        if (b.hasAttribute("data-cont")) return close();
+        if (b.dataset.m && !st.busy) { st.m = b.dataset.m; return draw(); }
+        if (b.hasAttribute("data-bank")) return busy(b, "Confirming transfer…", 1800, function () { succeed("bank"); });
+        if (b.hasAttribute("data-ussd")) return busy(b, "Confirming payment…", 1500, function () { succeed("ussd"); });
+        if (b.hasAttribute("data-card")) {
+          var n = $("#hc-n").value.replace(/\s/g, ""), ex = $("#hc-e").value, cv = $("#hc-c").value, now = new Date(), m = /^(0[1-9]|1[0-2])\/(\d\d)$/.exec(ex);
+          if (!/^\d{13,19}$/.test(n) || !luhn(n)) return err("Check the card number.");
+          if (!m || (2000 + +m[2]) * 12 + +m[1] < now.getFullYear() * 12 + now.getMonth() + 1) return err("Enter a valid expiry date (MM/YY), not in the past.");
+          if (!/^\d{3,4}$/.test(cv)) return err("Enter the 3 or 4 digit CVV.");
+          if (/0002$/.test(n)) return err("Card declined by your bank (demo). Try another card.");
+          busy(b, "Processing payment…", 1600, function () { succeed("card"); });
+        }
+      });
+      bg.addEventListener("input", function (e) {
+        var t = e.target;
+        if (t.id === "hc-n") t.value = t.value.replace(/\D/g, "").slice(0, 19).replace(/(\d{4})(?=\d)/g, "$1 ");
+        else if (t.id === "hc-e") { var d = t.value.replace(/\D/g, "").slice(0, 4); t.value = d.length > 2 ? d.slice(0, 2) + "/" + d.slice(2) : d; }
+        else if (t.id === "hc-c") t.value = t.value.replace(/\D/g, "").slice(0, 4);
+        var er = $("#hspErr"); if (er) er.hidden = true;
+      });
+      bg.addEventListener("change", function (e) { if (e.target.id === "hu-b") { st.bank = e.target.value; $("#hspUssd").textContent = "*" + BANKS[st.bank] + "*000*" + Math.round(o.amount) + "#"; } });
+      draw();
+      var f = $("#hc-n"); if (f) f.focus();
+    });
+  };
+})(window);

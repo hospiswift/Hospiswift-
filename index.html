@@ -170,6 +170,46 @@ nav button{font-size:11px}
 #vq,#fAmt{width:100%;padding:13px;border:1.5px solid var(--line);border-radius:12px;font:inherit;background:#fff;color:var(--ink)}
 #vq:focus,#fAmt:focus{outline:2px solid var(--accent);outline-offset:1px}
 .rcpt{display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid var(--line);font-size:14px}.rcpt span:first-child{color:var(--mute)}.rcpt span:last-child{font-weight:700;text-align:right;word-break:break-all}
+
+/* state, area, card slider, pharmacy page */
+.cartbar{z-index:36}
+.locrow{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 0 2px}
+.locbtn{display:flex;flex-direction:column;align-items:flex-start;text-align:left;background:#fff;border:1.5px solid var(--line);border-radius:14px;padding:10px 14px;position:relative;min-width:0}
+.locbtn small{font-size:11px;font-weight:700;color:var(--mute);text-transform:uppercase;letter-spacing:.05em}
+.locbtn b{font-size:16px;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding-right:20px}
+.locbtn svg{position:absolute;right:12px;bottom:14px;width:16px;height:16px;color:var(--mute)}
+.secth{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.cslide{display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;margin:0 -14px;padding:4px 14px 8px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.cslide::-webkit-scrollbar{display:none}.cslide[hidden]{display:none}
+.pcard{flex:0 0 80%;max-width:310px;scroll-snap-align:center;background:#fff;border:1.5px solid var(--line);border-radius:18px;padding:14px;text-align:left;display:flex;flex-direction:column;gap:10px;box-shadow:0 4px 14px rgba(27,29,33,.06)}
+.pcard.off{opacity:.7}
+.pc-top{display:flex;gap:12px;align-items:center}
+.pc-name{font-family:Sora,Figtree,sans-serif;font-weight:800;font-size:16px;line-height:1.2}
+.pc-meta{display:flex;gap:12px;font-size:13px;font-weight:700}
+.pc-foot{display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--line);padding-top:10px;margin-top:2px}
+.pc-go{color:var(--accent);font-weight:800;font-size:14px}
+.cpos{display:flex;justify-content:center;gap:6px;min-height:14px;font-size:12px;font-weight:700;color:var(--mute);margin-bottom:6px}
+.cpos i{width:7px;height:7px;border-radius:50%;background:var(--line)}.cpos i.on{background:var(--accent);width:18px;border-radius:99px}
+.plogo{width:46px;height:46px;border-radius:14px;overflow:hidden;flex:none;display:grid;place-items:center;background:#fff;border:1.5px solid var(--line)}
+.plogo span{width:100%;height:100%;display:grid;place-items:center;color:#fff;font-family:Sora,sans-serif;font-weight:800;font-size:17px}
+.plogo img{width:100%;height:100%;object-fit:cover}
+.plogo.lg{width:54px;height:54px;border-radius:16px;border:2px solid rgba(255,255,255,.85)}
+.ppage{position:fixed;top:0;bottom:0;left:0;right:0;z-index:35;background:var(--bg);display:flex;flex-direction:column;max-width:480px;margin:0 auto}
+.ppage[hidden]{display:none}
+.pphead{background:var(--graphite);color:#fff;display:flex;align-items:center;gap:12px;padding:calc(12px + env(safe-area-inset-top,0px)) 14px 18px;position:relative;border-radius:0 0 22px 22px;flex:none}
+.pphead:after{content:"";position:absolute;left:0;right:0;bottom:0;height:4px;background:linear-gradient(90deg,#1FB339,#1688FF);border-radius:0 0 22px 22px}
+.pback{width:40px;height:40px;border-radius:12px;border:1.5px solid rgba(255,255,255,.4);display:grid;place-items:center;color:#fff;flex:none}
+.ppn{font-family:Sora,Figtree,sans-serif;font-weight:800;font-size:18px;line-height:1.2}
+.pps{font-size:12.5px;color:#C9CBD0;margin-top:3px;line-height:1.35}
+.ppcons{background:transparent!important;color:#fff!important;border:1.5px solid rgba(255,255,255,.5);flex:none}
+.ppbody{flex:1;overflow-y:auto;padding:14px 14px calc(96px + env(safe-area-inset-bottom,0px))}
+body.pp .cartbar{bottom:calc(16px + env(safe-area-inset-bottom,0px))}
+.opt{display:flex;justify-content:space-between;align-items:center;gap:10px;width:100%;text-align:left;padding:14px 4px;border-bottom:1px solid var(--line);font-weight:600;font-size:16px}
+.opt small{font-size:12px;font-weight:600;color:var(--mute)}.opt.on{color:var(--accent);font-weight:800}.opt.on:after{content:"✓";margin-left:8px}
+.opt.dim{color:var(--mute)}
+.plist{max-height:52vh;overflow-y:auto}
+.pempty{text-align:center;padding:22px 16px}.pempty .row{justify-content:center}
+#pq{width:100%;padding:13px;border:1.5px solid var(--line);border-radius:12px;font:inherit;background:#fff;color:var(--ink)}
 </style>
 </head>
 <body>
@@ -190,17 +230,16 @@ nav button{font-size:11px}
   <section class="view on" id="v-pharm">
     <div class="hero">
       <div class="ico" style="background:#fff"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="9" width="18" height="6" rx="3" transform="rotate(-35 12 12)"/><path d="m9 9 6 6"/></svg></div>
-      <div><b>Medicine in 30–60 min</b><p>Verified pharmacies near you. Rider brings it to your door.</p></div>
+      <div><b>Medicine in 30–60 min</b><p>Pick your state and area to see pharmacies that deliver to you.</p></div>
     </div>
-    <div class="card row" id="favBar" style="margin-top:10px"></div>
-    <div id="shopBox">
-    <h2>Have a prescription?</h2>
-    <label class="upload"><input type="file" id="rxFile" accept="image/*,.pdf">📄 Upload prescription<div class="s" id="rxName" style="font-weight:500">A pharmacist will verify it before dispatch</div></label>
-    <h2>Categories</h2>
-    <div class="chips" id="cats"></div>
-    <h2>Medicines</h2>
-    <div id="drugs"></div>
+    <div class="locrow">
+      <button class="locbtn" id="stBtn" aria-haspopup="dialog"><small>State</small><b id="stTxt">Lagos</b><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></button>
+      <button class="locbtn" id="arBtn" aria-haspopup="dialog"><small>Community or area</small><b id="arTxt">Ikeja</b><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></button>
     </div>
+    <div class="secth"><h2 id="pTitle">Pharmacies</h2><span class="s" id="pCount"></span></div>
+    <div class="cslide" id="cslide" aria-label="Pharmacies"></div>
+    <div class="cpos" id="cpos" aria-live="polite"></div>
+    <div id="pEmpty"></div>
   </section>
 
   <section class="view" id="v-hosp">
@@ -234,6 +273,20 @@ nav button{font-size:11px}
 
   <p class="note">Demo prototype. Not a medical service. In an emergency call 112.</p>
 </main>
+
+<div class="ppage" id="ppage" role="dialog" aria-modal="true" aria-labelledby="ppName" hidden>
+  <div class="pphead">
+    <button class="pback" id="ppBack" aria-label="Back to pharmacies"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg></button>
+    <div class="plogo lg" id="ppLogo" aria-hidden="true"></div>
+    <div class="grow"><div class="ppn" id="ppName"></div><div class="pps" id="ppMeta"></div></div>
+    <button class="btn sm ppcons" id="ppCons">Consult</button>
+  </div>
+  <div class="ppbody">
+    <div id="ppClosed"></div>
+    <label class="upload" id="ppUp" hidden style="margin-bottom:12px"><input type="file" id="rxFile" accept="image/*,.pdf">📄 Upload prescription<div class="s" id="rxName" style="font-weight:500">A pharmacist will verify it before dispatch</div></label>
+    <div id="ppList"></div>
+  </div>
+</div>
 
 <div class="cartbar" id="cartbar" role="button" tabindex="0"><span id="cbCount"></span><span id="cbTotal"></span></div>
 
@@ -304,16 +357,16 @@ function byKm(a,b){return a.km-b.km}
 
 /* ---------- NAV ---------- */
 function show(v){
+  if(!$("#ppage").hidden)hidePP();
   document.querySelectorAll(".view").forEach(function(e){e.classList.remove("on")});
   $("#v-"+v).classList.add("on");
   document.querySelectorAll("nav button").forEach(function(b){b.classList.toggle("on",b.dataset.v===v)});
   document.body.classList.toggle("hosp",v==="hosp");
   document.querySelector('meta[name="theme-color"]').content="#25272B";
   $("#searchWrap").style.display=(v==="orders"||v==="acct"||v==="wallet")?"none":"flex";
-  $("#q").placeholder=v==="hosp"?"Search hospitals or doctors":"Search drugs or pharmacies";
+  $("#q").placeholder=v==="hosp"?"Search hospitals or doctors":"Search pharmacies by name";
   $("#q").value="";S.q="";
   if(v==="hosp")renderHosp();else if(v==="pharm")renderPharm();else if(v==="acct")renderAcct();else if(v==="wallet")renderWallet();else renderOrders();
-  if(v==="pharm"&&!S.vOK)openVendors();
   updateCartBar();window.scrollTo(0,0);
 }
 document.querySelectorAll("nav button").forEach(function(b){b.onclick=function(){show(b.dataset.v)}});
@@ -322,62 +375,117 @@ $("#q").oninput=function(e){S.q=e.target.value.toLowerCase();var on=document.que
 
 /* ---------- PHARMACY ---------- */
 var PILL='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="9" width="18" height="6" rx="3" transform="rotate(-35 12 12)"/><path d="m9 9 6 6"/></svg>';
+function norm(x){return String(x||"").trim().toLowerCase()}
+function guessPlace(){   /* start from the saved choice, else read the delivery address */
+  var addr=norm(PRO&&PRO.addr),st=PRO&&PRO.st,ar=PRO&&PRO.ar;
+  if(!st){HS.STATES.some(function(x){if(addr.indexOf(norm(x))>-1){st=x;return true}});st=st||"Lagos"}
+  if(!ar){HS.areas(st).some(function(x){if(addr.indexOf(norm(x))>-1){ar=x;return true}});ar=ar||"All areas"}
+  S.st=st;S.ar=ar;
+}
+function savePlace(){if(PRO){PRO.st=S.st;PRO.ar=S.ar;HS.saveProfile(SESS.id,PRO)}}
+function pharmsHere(){
+  var q=norm(S.q),fav=PRO&&PRO.favP;
+  return HS.listings("pharm").filter(function(x){return norm(x.state)===norm(S.st)&&(S.ar==="All areas"||norm(x.area)===norm(S.ar))&&(!q||norm(x.name).indexOf(q)>-1)})
+    .sort(function(a,b){return (a.closed?1:0)-(b.closed?1:0)||(b.id===fav)-(a.id===fav)||byKm(a,b)});
+}
+function plogo(l){
+  if(l.logo)return '<img src="'+esc(l.logo)+'" alt="">';
+  var cl=["#128A28","#0B63C9","#25272B","#0E7C86"],h=0,i;for(i=0;i<l.name.length;i++)h=(h*31+l.name.charCodeAt(i))%997;
+  var w=l.name.replace(/\b(pharmacy|pharmacies|chemist|chemists|medicals|meds|ltd)\b/ig,"").trim().split(/\s+/).filter(Boolean);
+  return '<span style="background:'+cl[h%4]+'">'+esc(((w[0]||l.name).charAt(0)+(w[1]||"").charAt(0)).toUpperCase())+'</span>';
+}
+function pcard(x){
+  var n=HS.stock(x.id).filter(function(d){return d.on!==0}).length,fav=PRO&&PRO.favP;
+  return '<button class="pcard'+(x.closed?' off':'')+'" data-pid="'+esc(x.id)+'" aria-label="Open '+esc(x.name)+'">'+
+    '<div class="pc-top"><div class="plogo">'+plogo(x)+'</div><div class="grow"><div class="pc-name">'+esc(x.name)+'</div><div class="s">'+esc(x.area||"")+(x.area&&x.state?', ':'')+esc(x.state||"")+'</div></div></div>'+
+    '<div class="pc-meta"><span>★ '+esc(x.rating)+'</span><span>'+x.km+' km</span><span>'+x.eta+' min</span></div>'+
+    '<div class="vtags">'+(x.closed?'<span class="tag red">Closed now</span>':'<span class="tag">Open</span>')+(x.id===fav?'<span class="tag">★ Favourite</span>':'')+(x.open==="24 hrs"?'<span class="tag">24 hrs</span>':'')+'</div>'+
+    '<div class="s">Open '+esc(x.open)+' · Delivery '+naira(500+Math.round(x.km*150))+'</div>'+
+    '<div class="pc-foot"><span class="s">'+n+' medicines</span><span class="pc-go">View inventory →</span></div></button>';
+}
+function updatePos(){
+  var c=$("#cslide"),k=c.children.length,box=$("#cpos");
+  if(k<2){box.innerHTML="";return}
+  var w=c.firstElementChild.offsetWidth+12,i=Math.min(k-1,Math.max(0,Math.round(c.scrollLeft/w)));
+  box.innerHTML=k<=8?Array.apply(null,Array(k)).map(function(_,j){return '<i'+(j===i?' class="on"':'')+'></i>'}).join(""):(i+1)+" of "+k;
+}
 function renderPharm(){
-  var p=pharm(),st=stock().filter(function(d){return d.on!==0});
-  $("#shopBox").hidden=!S.vOK;
-  if(!S.vOK){
-    $("#favBar").innerHTML='<div class="grow"><div class="t">Choose your pharmacy</div><div class="s">Medicines, prices and delivery depend on the pharmacy you pick.</div></div><button class="btn sm" id="pickV">Choose</button>';
-    $("#pickV").onclick=openVendors;
-    return;
-  }
-  $("#favBar").innerHTML='<div class="grow"><div class="s">Ordering from</div><div class="t">'+esc(p.name)+(p.id===(PRO&&PRO.favP)?' <span class="tag">★ Favourite</span>':'')+'</div><div class="s">'+(p.closed?'<span class="tag red">Closed now</span> ':'')+p.km+' km · '+p.eta+' min · ★ '+esc(p.rating)+'</div></div><div style="display:grid;gap:6px"><button class="btn sm out" id="chV">Change</button><button class="btn sm out" id="conV">Consult</button></div>';
-  var cats=["All"].concat(st.map(function(d){return d.c}).filter(function(c,i,a){return a.indexOf(c)===i}));
-  $("#cats").innerHTML=cats.map(function(c){return '<button class="chip'+(c===S.cat?' on':'')+'" data-c="'+esc(c)+'">'+esc(c)+'</button>'}).join("");
-  document.querySelectorAll("#cats .chip").forEach(function(b){b.onclick=function(){S.cat=b.dataset.c;renderPharm()}});
-  var list=st.filter(function(d){return (S.cat==="All"||d.c===S.cat)&&(!S.q||d.n.toLowerCase().indexOf(S.q)>-1)});
-  $("#drugs").innerHTML=list.length?list.map(function(d){
-    var n=S.cart[d.id]||0,out=d.q<=0;
-    return '<div class="card row"><div class="ico">'+PILL+'</div>'+
-    '<div class="grow"><div class="t">'+esc(d.n)+'</div><div class="s">'+esc(d.k)+'</div><div style="margin-top:4px"><span class="price">'+naira(d.p)+'</span> '+(out?'<span class="tag red">Out of stock</span>':d.rx?'<span class="tag rx">Prescription</span>':'<span class="tag">No prescription</span>')+(!out&&d.q<=10?' <span class="tag rx">'+d.q+' left</span>':'')+'</div></div>'+
-    (out?'':n?'<div class="qty"><button data-m="'+d.id+'" aria-label="Remove one">−</button><b>'+n+'</b><button data-p="'+d.id+'" aria-label="Add one"'+(n>=d.q?' disabled':'')+'>+</button></div>':'<button class="btn sm" data-p="'+d.id+'">Add</button>')+'</div>'
-  }).join(""):'<div class="empty">No medicine found. Try another name or upload your prescription.</div>';
-  document.querySelectorAll("#drugs [data-p]").forEach(function(b){b.onclick=function(){S.cart[b.dataset.p]=(S.cart[b.dataset.p]||0)+1;renderPharm();updateCartBar()}});
-  document.querySelectorAll("#drugs [data-m]").forEach(function(b){b.onclick=function(){var id=b.dataset.m;S.cart[id]--;if(S.cart[id]<=0)delete S.cart[id];renderPharm();updateCartBar()}});
-  $("#chV").onclick=openVendors;
-  $("#conV").onclick=function(){openBook("pharm",S.pharm)};
+  $("#stTxt").textContent=S.st;$("#arTxt").textContent=S.ar;
+  $("#locTxt").textContent=S.st+(S.ar==="All areas"?"":" – "+S.ar);
+  var l=pharmsHere(),where=S.ar==="All areas"?S.st:S.ar+", "+S.st;
+  $("#pTitle").textContent="Pharmacies in "+(S.ar==="All areas"?S.st:S.ar);
+  $("#pCount").textContent=l.length?l.length+" found":"";
+  $("#cslide").hidden=!l.length;$("#cslide").innerHTML=l.map(pcard).join("");$("#cslide").scrollLeft=0;
+  document.querySelectorAll(".pcard").forEach(function(b){b.onclick=function(){openPharmacy(b.dataset.pid)}});
+  updatePos();
+  $("#pEmpty").innerHTML=l.length?"":'<div class="card pempty"><div class="t">'+(S.q?'No pharmacy matches “'+esc(S.q)+'”':'No pharmacies in '+esc(where)+' yet')+'</div><div class="s" style="margin:6px 0 14px">Pharmacies join Hosirx every week. Try another area'+(S.ar!=="All areas"?' or see all of '+esc(S.st):'')+'.</div><div class="row">'+(S.ar!=="All areas"?'<button class="btn sm" id="eAll">See all of '+esc(S.st)+'</button>':'')+'<button class="btn sm out" id="eArea">Change area</button></div></div>';
+  if($("#eAll"))$("#eAll").onclick=function(){S.ar="All areas";savePlace();renderPharm()};
+  if($("#eArea"))$("#eArea").onclick=openAreaPicker;
+}
+$("#cslide").addEventListener("scroll",function(){updatePos()});
+$("#stBtn").onclick=openStatePicker;$("#arBtn").onclick=function(){openAreaPicker()};$("#loc").onclick=function(){openAreaPicker()};
+
+/* ---------- STATE AND AREA PICKERS ---------- */
+function picker(title,ph,items,onPick){   /* items: [{v,label,sub,on,dim}] */
+  openSheet('<h3>'+esc(title)+'</h3><div class="gf"><input id="pq" type="search" placeholder="'+esc(ph)+'" autocomplete="off" aria-label="'+esc(ph)+'"></div><div class="plist" id="plist"></div>');
+  var draw=function(){var q=norm($("#pq").value),l=items.filter(function(i){return !q||norm(i.label).indexOf(q)>-1});
+    $("#plist").innerHTML=l.length?l.map(function(i,k){return '<button class="opt'+(i.on?' on':'')+(i.dim?' dim':'')+'" data-k="'+items.indexOf(i)+'"><span>'+esc(i.label)+'</span><small>'+esc(i.sub||"")+'</small></button>'}).join(""):'<div class="empty" style="padding:24px 0">Nothing matches “'+esc($("#pq").value)+'”.</div>';
+    document.querySelectorAll("#plist .opt").forEach(function(b){b.onclick=function(){onPick(items[+b.dataset.k])}})};
+  $("#pq").oninput=draw;draw();
+}
+function countBy(key,st){var c={};HS.listings("pharm").forEach(function(x){if(st&&norm(x.state)!==norm(st))return;var k=norm(x[key]);c[k]=(c[k]||0)+1});return c}
+function plural(n){return n?n+(n>1?" pharmacies":" pharmacy"):"No pharmacies yet"}
+function openStatePicker(){
+  var c=countBy("state"),items=HS.STATES.map(function(x){return {v:x,label:x,sub:plural(c[norm(x)]||0),on:x===S.st,dim:!c[norm(x)],n:c[norm(x)]||0}})
+    .sort(function(a,b){return b.n-a.n||(a.label<b.label?-1:1)});
+  picker("Choose your state","Search states",items,function(i){
+    var changed=i.v!==S.st;S.st=i.v;if(changed)S.ar="All areas";savePlace();renderPharm();
+    if(changed)openAreaPicker(true);else closeSheet();
+  });
+}
+function openAreaPicker(fromState){
+  var c=countBy("area",S.st),total=Object.keys(c).reduce(function(a,k){return a+c[k]},0);
+  var items=[{v:"All areas",label:"All areas in "+S.st,sub:plural(total),on:S.ar==="All areas"}].concat(HS.areas(S.st).map(function(x){return {v:x,label:x,sub:plural(c[norm(x)]||0),on:norm(x)===norm(S.ar),dim:!c[norm(x)],n:c[norm(x)]||0}}).sort(function(a,b){return b.n-a.n||(a.label<b.label?-1:1)}));
+  picker("Choose your community or area in "+S.st,"Search areas",items,function(i){S.ar=i.v;savePlace();closeSheet();renderPharm()});
 }
 
-/* ---------- VENDOR DRAWER ---------- */
-function vfee(x){return 500+Math.round(x.km*150)}
-function lastPharm(){var o=HS.orders(function(o){return o.cust===SESS.id})[0];return o?o.pid:null}
-function vendorList(){
-  var q=(S.vq||"").trim().toLowerCase(),fav=PRO&&PRO.favP,last=lastPharm();
-  var all=HS.listings("pharm"),open=all.filter(function(x){return !x.closed}).sort(byKm),nearest=open[0]&&open[0].id;
-  var by={near:byKm,fast:function(a,b){return a.eta-b.eta||byKm(a,b)},top:function(a,b){return b.rating-a.rating||byKm(a,b)}}[S.vs]||byKm;
-  var l=all.filter(function(x){return !q||x.name.toLowerCase().indexOf(q)>-1}).sort(function(a,b){return (a.closed?1:0)-(b.closed?1:0)||by(a,b)});
-  $("#vlist").innerHTML=l.length?l.map(function(x){
-    var cur=S.vOK&&x.id===S.pharm,tags=(x.id===nearest?'<span class="tag">Nearest</span>':'')+(x.id===fav?'<span class="tag">★ Favourite</span>':'')+(x.id===last?'<span class="tag">Ordered before</span>':'')+(x.open==="24 hrs"?'<span class="tag">24 hrs</span>':'')+(x.closed?'<span class="tag red">Closed now</span>':'');
-    return '<div class="card vcard'+(x.closed?' off':'')+(cur?' cur':'')+'"><div class="row"><div class="ico"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 3h4v7h7v4h-7v7h-4v-7H3v-4h7z"/></svg></div><div class="grow"><div class="t">'+esc(x.name)+'</div><div class="s">★ '+esc(x.rating)+' · '+x.km+' km · about '+x.eta+' min</div><div class="s">'+(x.closed?'Closed now':'Open '+esc(x.open))+' · Delivery '+naira(vfee(x))+'</div><div class="vtags">'+tags+'</div></div><button class="btn sm'+(cur?' out':'')+'" data-vp="'+esc(x.id)+'"'+(x.closed?' disabled':'')+'>'+(cur?'Selected':x.closed?'Closed':'Select')+'</button></div></div>';
-  }).join(""):'<div class="empty">No pharmacy matches “'+esc(S.vq)+'”.</div>';
-  document.querySelectorAll("[data-vp]").forEach(function(b){b.onclick=function(){pickVendor(b.dataset.vp)}});
-}
-function vendorSort(){
-  $("#vsort").innerHTML=[["near","Nearest"],["fast","Fastest"],["top","Top rated"]].map(function(t){return '<button class="chip'+(S.vs===t[0]?' on':'')+'" data-vs="'+t[0]+'">'+t[1]+'</button>'}).join("");
-  document.querySelectorAll("[data-vs]").forEach(function(b){b.onclick=function(){S.vs=b.dataset.vs;vendorSort();vendorList()}});
-}
-function openVendors(){
-  openSheet('<h3>Choose a pharmacy</h3><div class="s" style="margin-bottom:10px">Pharmacies that can deliver to '+esc(PRO.addr)+'. Pick one to see its medicines and prices.</div><div class="gf"><input id="vq" type="search" placeholder="Search pharmacies" value="'+esc(S.vq)+'" autocomplete="off" aria-label="Search pharmacies"></div><div class="chips scroll" id="vsort"></div><div id="vlist"></div>');
-  $("#vq").oninput=function(e){S.vq=e.target.value;vendorList()};
-  vendorSort();vendorList();
-}
-function pickVendor(id){
-  if(S.vOK&&id===S.pharm){closeSheet();return}
-  var go=function(){S.pharm=id;S.vOK=true;S.cat="All";S.cart={};S.vq="";closeSheet();renderPharm();updateCartBar();toast("Ordering from "+HS.listing(id).name)};
-  if(S.vOK&&cartCount()){
+/* ---------- PHARMACY PAGE: name, logo and inventory ---------- */
+function openPharmacy(id){
+  var go=function(){if(id!==S.pharm)S.cart={};S.pharm=id;closeSheet();showPP();updateCartBar()};
+  if(cartCount()&&id!==S.pharm){
     openSheet('<h3>Switch pharmacy?</h3><div class="s" style="margin-bottom:14px">Your cart has '+cartCount()+' item'+(cartCount()>1?'s':'')+' from '+esc(pharm().name)+'. Prices and stock differ between pharmacies, so switching clears the cart.</div><div class="ctl"><button class="btn out" id="vNo">Keep cart</button><button class="btn" id="vYes">Switch</button></div>');
     $("#vNo").onclick=closeSheet;$("#vYes").onclick=go;
   }else go();
 }
+function showPP(){
+  var l=pharm();
+  $("#ppLogo").innerHTML=plogo(l);$("#ppName").textContent=l.name;
+  $("#ppMeta").textContent=(l.area?l.area+(l.state?", "+l.state:""):"")+" · ★ "+l.rating+" · "+l.km+" km · "+l.eta+" min";
+  renderInv();
+  $("#ppage").hidden=false;document.body.classList.add("pp");sync();$(".ppbody").scrollTop=0;
+  setTimeout(function(){$("#ppBack").focus()},0);
+}
+function hidePP(){$("#ppage").hidden=true;document.body.classList.remove("pp");sync()}
+function closePP(){hidePP();renderPharm();updateCartBar()}
+function renderInv(){
+  var l=pharm(),st=stock().filter(function(d){return d.on!==0}),closed=!!l.closed,cats=[],by={};
+  st.forEach(function(d){if(!by[d.c]){by[d.c]=[];cats.push(d.c)}by[d.c].push(d)});
+  $("#ppUp").hidden=closed||!st.some(function(d){return d.rx});
+  $("#ppClosed").innerHTML=closed?'<div class="card" style="background:#FFF8EC;border-color:#F0D9A8"><div class="t">Closed right now</div><div class="s">You can browse the inventory. Ordering opens when the pharmacy is back online.</div></div>':'<div class="s" style="margin:0 2px 2px">Open '+esc(l.open)+' · Delivery '+naira(fee())+'</div>';
+  $("#ppList").innerHTML=st.length?cats.map(function(c){
+    return '<div class="dayh">'+esc(c)+'</div>'+by[c].map(function(d){
+      var n=S.cart[d.id]||0,out=d.q<=0;
+      return '<div class="card row"><div class="ico">'+PILL+'</div>'+
+      '<div class="grow"><div class="t">'+esc(d.n)+'</div><div class="s">'+esc(d.k)+'</div><div style="margin-top:4px"><span class="price">'+naira(d.p)+'</span> '+(out?'<span class="tag red">Out of stock</span>':d.rx?'<span class="tag rx">Prescription</span>':'<span class="tag">No prescription</span>')+(!out&&d.q<=10?' <span class="tag rx">'+d.q+' left</span>':'')+'</div></div>'+
+      (out||closed?'':n?'<div class="qty"><button data-m="'+d.id+'" aria-label="Remove one">−</button><b>'+n+'</b><button data-p="'+d.id+'" aria-label="Add one"'+(n>=d.q?' disabled':'')+'>+</button></div>':'<button class="btn sm" data-p="'+d.id+'">Add</button>')+'</div>';
+    }).join("");
+  }).join(""):'<div class="empty">This pharmacy has not listed any medicines yet.</div>';
+  document.querySelectorAll("#ppList [data-p]").forEach(function(b){b.onclick=function(){S.cart[b.dataset.p]=(S.cart[b.dataset.p]||0)+1;renderInv();updateCartBar()}});
+  document.querySelectorAll("#ppList [data-m]").forEach(function(b){b.onclick=function(){var id=b.dataset.m;S.cart[id]--;if(S.cart[id]<=0)delete S.cart[id];renderInv();updateCartBar()}});
+}
+$("#ppBack").onclick=closePP;
+$("#ppCons").onclick=function(){openBook("pharm",S.pharm)};
+document.addEventListener("keydown",function(e){if(e.key==="Escape"&&!$("#ppage").hidden&&!$("#sheet").classList.contains("on")&&!document.querySelector(".hsp-bg"))closePP()});
 $("#rxFile").onchange=function(e){var f=e.target.files[0];if(f){S.rx=f.name;$("#rxName").textContent="✔ "+f.name+" attached";toast("Prescription attached")}};
 function updateCartBar(){
   var c=cartCount(),on=c>0&&$("#v-pharm").classList.contains("on");
@@ -518,11 +626,6 @@ setInterval(function(){
 HS.onChange(function(){if(SESS&&SESS.role==="customer"&&$("#v-orders").classList.contains("on"))renderOrders();if(SESS&&SESS.role==="customer")renderOrdersBadge()});
 function renderOrdersBadge(){var n=HS.orders(function(o){return o.cust===SESS.id}).length+HS.visits(function(v){return v.cust===SESS.id}).length;$("#obadge").hidden=!n;$("#obadge").textContent=n}
 
-/* ---------- LOCATION ---------- */
-$("#loc").onclick=function(){
-  var c=["Lagos – Ikeja","Lagos – Lekki","Abuja – Wuse","Port Harcourt – GRA"];
-  var i=c.indexOf($("#locTxt").textContent);$("#locTxt").textContent=c[(i+1)%c.length];toast("Showing pharmacies and hospitals near "+$("#locTxt").textContent);
-};
 
 /* ---------- ACCOUNT ---------- */
 function favSelects(p){
@@ -587,7 +690,9 @@ function renderAcct(){
 /* ---------- SIGN-IN: customer, pharmacy, hospital ---------- */
 function sync(){
   var g=!$("#gate").hidden,f=$("#pframe").classList.contains("on");
-  ["header","main","nav","#cartbar"].forEach(function(sel){var el=document.querySelector(sel);if(el)el.inert=g||f});
+  ["header","main","nav"].forEach(function(sel){var el=document.querySelector(sel);if(el)el.inert=g||f||!$("#ppage").hidden});
+  var cb=$("#cartbar");if(cb)cb.inert=g||f;
+  $("#ppage").inert=g||f;
   $("#gate").inert=f;
 }
 function openFrame(mode,demo,type){FR.mode=mode;$("#pf").src="partners.html?embed="+mode+(demo?"&demo="+demo:"")+(type?"&type="+type:"");$("#pframe").classList.add("on");sync()}
@@ -663,11 +768,11 @@ function enter(){
   if(!PRO){showGate("cus",2);return}
   $("#gate").hidden=true;closeFrame();
   if(!S.pharm||!HS.listing(S.pharm))S.pharm=PRO.favP;
-  S.vOK=false;S.vq="";
+  guessPlace();
   show("pharm");renderOrdersBadge();
 }
 function signOut(){
-  SESS=null;PRO=null;saveSess();$("#acct").innerHTML="";S.cart={};S.pharm=null;S.vOK=false;S.rx=null;closeSheet();closeFrame();showGate("cus");toast("Signed out");
+  SESS=null;PRO=null;saveSess();$("#acct").innerHTML="";S.cart={};S.pharm=null;S.rx=null;hidePP();closeSheet();closeFrame();showGate("cus");toast("Signed out");
 }
 enter();
 })();

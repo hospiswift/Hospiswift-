@@ -33,17 +33,24 @@
   HS.webOk = function (k) { return !HS.isLive(k) && k !== "Emergency"; };                    /* offered on the website */
 
   var BASE = [
-    { id: "p1", kind: "pharm", name: "HealthPlus Pharmacy", km: 1.2, eta: 25, rating: 4.8, open: "24 hrs", fees: { "Video": 2000, "Voice": 1500, "Chat": 1000 } },
-    { id: "p2", kind: "pharm", name: "MedPoint Pharmacy", km: 2.4, eta: 35, rating: 4.6, open: "8am – 10pm", fees: { "Video": 1800, "Voice": 1200, "Chat": 800 } },
-    { id: "p3", kind: "pharm", name: "Alpha Care Chemist", km: 3.1, eta: 40, rating: 4.5, open: "24 hrs", fees: { "Video": 2500, "Voice": 1800, "Chat": 1000 } },
-    { id: "p4", kind: "pharm", name: "GreenCross Pharmacy", km: 4.0, eta: 50, rating: 4.3, open: "7am – 9pm", fees: { "Video": 1500, "Voice": 1000, "Chat": 700 } },
-    { id: "h1", kind: "hosp", name: "Lagoon General Hospital", km: 1.8, type: "General", open24: true, rating: 4.6, phone: "+2348000000001", docs: ["Dr. Adeyemi – GP", "Dr. Okafor – Paediatrics"],
+    { id: "p1", kind: "pharm", name: "HealthPlus Pharmacy", state: "Lagos", area: "Ikeja", addr: "12 Allen Avenue", km: 1.2, eta: 25, rating: 4.8, open: "24 hrs", fees: { "Video": 2000, "Voice": 1500, "Chat": 1000 } },
+    { id: "p2", kind: "pharm", name: "MedPoint Pharmacy", state: "Lagos", area: "Ikeja", addr: "8 Obafemi Awolowo Way", km: 2.4, eta: 35, rating: 4.6, open: "8am – 10pm", fees: { "Video": 1800, "Voice": 1200, "Chat": 800 } },
+    { id: "p3", kind: "pharm", name: "Alpha Care Chemist", state: "Lagos", area: "Lekki", addr: "Admiralty Way, Lekki Phase 1", km: 3.1, eta: 40, rating: 4.5, open: "24 hrs", fees: { "Video": 2500, "Voice": 1800, "Chat": 1000 } },
+    { id: "p4", kind: "pharm", name: "GreenCross Pharmacy", state: "Lagos", area: "Yaba", addr: "Herbert Macaulay Way", km: 4.0, eta: 50, rating: 4.3, open: "7am – 9pm", fees: { "Video": 1500, "Voice": 1000, "Chat": 700 } },
+    { id: "p5", kind: "pharm", name: "Island Wellness Pharmacy", state: "Lagos", area: "Victoria Island", addr: "Adeola Odeku Street", km: 5.2, eta: 55, rating: 4.7, open: "8am – 11pm", fees: { "Video": 2800, "Voice": 2000, "Chat": 1200 } },
+    { id: "p6", kind: "pharm", name: "Surulere Family Pharmacy", state: "Lagos", area: "Surulere", addr: "Bode Thomas Street", km: 6.0, eta: 60, rating: 4.4, open: "7am – 10pm", fees: { "Video": 1600, "Voice": 1100, "Chat": 700 } },
+    { id: "p7", kind: "pharm", name: "Capital Care Pharmacy", state: "FCT Abuja", area: "Wuse", addr: "Aminu Kano Crescent", km: 1.5, eta: 30, rating: 4.6, open: "24 hrs", fees: { "Video": 2200, "Voice": 1600, "Chat": 1000 } },
+    { id: "p8", kind: "pharm", name: "Maitama Health Chemist", state: "FCT Abuja", area: "Maitama", addr: "Ado Bayero Close", km: 2.8, eta: 35, rating: 4.8, open: "8am – 9pm", fees: { "Video": 2600, "Voice": 1900, "Chat": 1200 } },
+    { id: "p9", kind: "pharm", name: "Gwarinpa Meds", state: "FCT Abuja", area: "Gwarinpa", addr: "3rd Avenue", km: 4.4, eta: 45, rating: 4.3, open: "8am – 8pm", closed: true, fees: { "Video": 1500, "Voice": 1000, "Chat": 600 } },
+    { id: "p10", kind: "pharm", name: "Garden City Pharmacy", state: "Rivers", area: "Port Harcourt GRA", addr: "Aba Road", km: 1.9, eta: 30, rating: 4.5, open: "24 hrs", fees: { "Video": 2000, "Voice": 1400, "Chat": 900 } },
+    { id: "p11", kind: "pharm", name: "Bodija Pharmacy", state: "Oyo", area: "Bodija", addr: "Bodija Market Road", km: 2.2, eta: 35, rating: 4.4, open: "8am – 9pm", fees: { "Video": 1500, "Voice": 1000, "Chat": 700 } },
+    { id: "h1", kind: "hosp", state: "Lagos", area: "Ikeja", name: "Lagoon General Hospital", km: 1.8, type: "General", open24: true, rating: 4.6, phone: "+2348000000001", docs: ["Dr. Adeyemi – GP", "Dr. Okafor – Paediatrics"],
       fees: { "Video": 8000, "Voice": 6000, "Chat": 4000, "In person": 10000, "Emergency": 15000, "Follow-up": 5000, "Specialist": 12000, "Antenatal": 9000, "Registration": 3000 } },
-    { id: "h2", kind: "hosp", name: "St. Mary Specialist Hospital", km: 3.2, type: "Specialist", open24: true, rating: 4.7, phone: "+2348000000002", docs: ["Dr. Bello – Cardiology", "Dr. Eze – Surgery"],
+    { id: "h2", kind: "hosp", state: "Lagos", area: "Victoria Island", name: "St. Mary Specialist Hospital", km: 3.2, type: "Specialist", open24: true, rating: 4.7, phone: "+2348000000002", docs: ["Dr. Bello – Cardiology", "Dr. Eze – Surgery"],
       fees: { "Video": 12000, "Voice": 9000, "Chat": 6000, "In person": 15000, "Emergency": 25000, "Follow-up": 8000, "Specialist": 20000, "Registration": 5000 } },
-    { id: "h3", kind: "hosp", name: "Bright Future Maternity Centre", km: 4.5, type: "Maternity", open24: false, rating: 4.4, phone: "+2348000000003", docs: ["Dr. Ibrahim – Obstetrics", "Dr. Nwosu – Midwifery"],
+    { id: "h3", kind: "hosp", state: "Lagos", area: "Surulere", name: "Bright Future Maternity Centre", km: 4.5, type: "Maternity", open24: false, rating: 4.4, phone: "+2348000000003", docs: ["Dr. Ibrahim – Obstetrics", "Dr. Nwosu – Midwifery"],
       fees: { "Video": 7000, "Voice": 5000, "Chat": 3000, "In person": 9000, "Emergency": 15000, "Follow-up": 4500, "Antenatal": 8000, "Registration": 2500 } },
-    { id: "h4", kind: "hosp", name: "CityCare Clinic", km: 2.1, type: "Clinic", open24: false, rating: 4.2, phone: "+2348000000004", docs: ["Dr. Balogun – GP", "Dr. Musa – Dental"],
+    { id: "h4", kind: "hosp", state: "Lagos", area: "Yaba", name: "CityCare Clinic", km: 2.1, type: "Clinic", open24: false, rating: 4.2, phone: "+2348000000004", docs: ["Dr. Balogun – GP", "Dr. Musa – Dental"],
       fees: { "Video": 5000, "Voice": 4000, "Chat": 2500, "In person": 6000, "Emergency": 10000, "Follow-up": 3000, "Registration": 2000 } }
   ];
   var DEF_STOCK = [
@@ -58,6 +65,22 @@
     { id: 9, n: "Artemether/Lumefantrine", c: "Malaria", k: "Adult course", p: 2500, q: 99, rx: 0, on: 1 }
   ];
 
+  /* ===== states and areas (communities) ===== */
+  HS.STATES = ["Abia", "Adamawa", "Akwa Ibom", "Anambra", "Bauchi", "Bayelsa", "Benue", "Borno", "Cross River", "Delta", "Ebonyi", "Edo", "Ekiti", "Enugu", "FCT Abuja", "Gombe", "Imo", "Jigawa", "Kaduna", "Kano", "Katsina", "Kebbi", "Kogi", "Kwara", "Lagos", "Nasarawa", "Niger", "Ogun", "Ondo", "Osun", "Oyo", "Plateau", "Rivers", "Sokoto", "Taraba", "Yobe", "Zamfara"];
+  HS.AREAS = {
+    "Lagos": ["Ikeja", "Lekki", "Victoria Island", "Ikoyi", "Yaba", "Surulere", "Ajah", "Maryland", "Gbagada", "Ikorodu", "Festac", "Apapa", "Magodo", "Oshodi", "Agege", "Alimosho", "Mushin", "Badagry", "Epe", "Ojo"],
+    "FCT Abuja": ["Wuse", "Garki", "Maitama", "Asokoro", "Gwarinpa", "Jabi", "Utako", "Kubwa", "Lugbe", "Karu"],
+    "Rivers": ["Port Harcourt GRA", "Rumuola", "Rumuokoro", "Trans-Amadi", "Diobu", "Eleme"],
+    "Oyo": ["Bodija", "Ring Road", "Challenge", "Dugbe", "Mokola", "Iwo Road"],
+    "Ogun": ["Abeokuta", "Sagamu", "Ijebu-Ode", "Ota", "Ifo"],
+    "Kano": ["Nassarawa", "Sabon Gari", "Fagge", "Bompai"],
+    "Kaduna": ["Barnawa", "Ungwan Rimi", "Malali", "Kawo"],
+    "Enugu": ["Independence Layout", "Ogui", "Trans-Ekulu", "New Haven"],
+    "Edo": ["Benin GRA", "Ugbowo", "Sapele Road"],
+    "Delta": ["Asaba", "Warri", "Effurun"],
+    "Anambra": ["Awka", "Onitsha", "Nnewi"]
+  };
+
   /* ===== listings ===== */
   function liveMap() { return get("hs_live", {}); }
   function allBase() { var l = liveMap(); return BASE.concat(Object.keys(l).map(function (k) { return l[k]; })); }
@@ -66,11 +89,23 @@
   HS.setFees = function (id, f) { var o = get("hs_fees", {}); o[id] = clone(f); put("hs_fees", o); };
   HS.listing = function (id) { var l = find(id); if (!l) return null; l = clone(l); l.fees = HS.fees(id); return l; };
   HS.listings = function (kind) { return allBase().filter(function (x) { return x.kind === kind; }).map(function (x) { return HS.listing(x.id); }); };
+  HS.areas = function (state) {   /* known areas of a state plus any area a partner has registered in it */
+    var seen = {}, out = [], add = function (a) { a = String(a || "").trim().replace(/\s+/g, " "); if (a && !seen[a.toLowerCase()]) { seen[a.toLowerCase()] = 1; out.push(a); } };
+    (HS.AREAS[state] || []).forEach(add);
+    HS.listings("pharm").concat(HS.listings("hosp")).forEach(function (l) { if (l.state === state) add(l.area); });
+    return out;
+  };
   HS.pros = function (l) { return (l.docs && l.docs.length) ? l.docs : (l.kind === "hosp" ? [] : ["Pharm. A. Obi", "Pharm. K. Yusuf"]); };
   HS.publish = function (l) { var m = liveMap(); m[l.id] = l; put("hs_live", m); };   /* real partners appear to customers */
   HS.setAvail = function (id, m) { var a = get("hs_avail", {}); a[id] = clone(m); put("hs_avail", a); };   /* doctor availability: {label:{on,off:[times]}} */
   HS.avail = function (id) { return get("hs_avail", {})[id] || null; };
-  HS.stock = function (id) { var s = get("hs_stock", {}); return s[id] ? clone(s[id]) : clone(DEF_STOCK); };
+  function demoStock(id) {   /* demo pharmacies p2 to p11 stock a slightly different range at slightly different prices */
+    var n = parseInt(String(id).slice(1), 10), f = [1, 0.95, 1.05, 1.1, 0.9, 1.08, 1.02, 0.97, 1.04, 1.06][n % 10];
+    return DEF_STOCK.filter(function (d) { return (d.id + n) % 5 !== 0; }).map(function (d) {
+      var x = clone(d); x.p = Math.max(100, Math.round(d.p * f / 50) * 50); x.q = ((d.id * 7 + n * 13) % 90) + 5; return x;
+    });
+  }
+  HS.stock = function (id) { var s = get("hs_stock", {}); return s[id] ? clone(s[id]) : /^p([2-9]|1[01])$/.test(id) ? demoStock(id) : clone(DEF_STOCK); };
   HS.setStock = function (id, arr) { var s = get("hs_stock", {}); s[id] = clone(arr); put("hs_stock", s); };
 
   /* ===== orders and visits ===== */

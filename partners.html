@@ -130,7 +130,7 @@ h1,h2,h3{font-family:Sora,Figtree,sans-serif}
 "use strict";
 var $=function(s){return document.querySelector(s)};
 var QS=new URLSearchParams(location.search),DEMO=QS.get("demo")||"",WEB=QS.get("web")==="1",TYPE=QS.get("type")||"";
-var STATES=["Lagos","FCT Abuja","Rivers","Oyo","Kano","Enugu","Edo","Kaduna","Ogun","Delta","Anambra","Other"];
+var STATES=HS.STATES;
 var BANKS=["Access Bank","GTBank","First Bank","UBA","Zenith Bank","Opay","Moniepoint","Kuda","Other"];
 function M(id,l,r,hint){return {id:id,l:l,t:"text",v:"money",r:r,h:hint}}
 var DEPTS=["General","Emergency","Paediatrics","Maternity","Cardiology","Surgery","Dental","Eye","Mental health"];
@@ -139,7 +139,7 @@ var DEPTS=["General","Emergency","Paediatrics","Maternity","Cardiology","Surgery
 var BIZ=[
  {id:"name",l:"Business name",t:"text",r:1},
  {id:"state",l:"State",t:"select",o:STATES,r:1},
- {id:"city",l:"City or area",t:"text",r:1},
+ {id:"city",l:"Community or area",t:"text",r:1,h:"Customers find you by state and area, for example Ikeja, Wuse or Port Harcourt GRA."},
  {id:"addr",l:"Street address",t:"text",r:1,h:"Riders and patients use this to find you."},
  {id:"phone",l:"Business phone",t:"tel",r:1,v:"phone"},
  {id:"email",l:"Email",t:"email",r:1,v:"email"},
@@ -352,7 +352,7 @@ function lst(h){return '<div class="lst">'+h+'</div>'}
 function pLocal(){try{localStorage.setItem(PK,JSON.stringify(P))}catch(e){}}
 function listing(){
   var d=S.d||{},h=0,ref=String(S.ref||"");for(var i=0;i<ref.length;i++)h=(h*31+ref.charCodeAt(i))%97;
-  var l={id:pid(),kind:S.type==="pharm"?"pharm":"hosp",name:d.name||"New partner",km:Math.round((1+h%40/10)*10)/10,rating:"New",fees:P.fees};
+  var l={id:pid(),kind:S.type==="pharm"?"pharm":"hosp",name:d.name||"New partner",state:d.state||"",area:String(d.city||"").trim().replace(/\s+/g," "),addr:d.addr||"",km:Math.round((1+h%40/10)*10)/10,rating:"New",fees:P.fees};
   if(S.type==="pharm"){l.eta=30+h%20;l.open=d.hours||"See hours on request";l.closed=!P.online}
   else{l.type="Clinic";l.open24=!!P.open24;l.phone=P.line||d.phone||"";l.docs=P.docs.filter(function(x){return x.on}).map(dl)}
   return l;

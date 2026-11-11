@@ -15,8 +15,12 @@ Sign-in screen > "Try a demo account" > Customer, Pharmacy or Hospital. Open two
 - Sign-in codes are shown on screen. Connect an SMS or email service. Partner approval is simulated.
 - Set `DEMO_ACCOUNTS=false` in `index.html` to remove the demo buttons.
 
-## Choosing a pharmacy
-The Pharmacy tab opens a drawer of nearby pharmacies first (search, sort by nearest, fastest or top rated, closed pharmacies greyed out). Medicine categories and prices appear only after a pharmacy is chosen, because stock and prices differ by pharmacy. Switching pharmacy with items in the cart asks first, then clears the cart.
+## Finding a pharmacy
+The Pharmacy tab starts with two buttons, State and Community or area. The starting choice comes from the customer's saved choice or their delivery address, and the choice is remembered. Pharmacies in that place appear as a sliding row of cards (name, logo, rating, distance, hours, delivery fee, number of medicines, open or closed). Tapping a card opens a full-page sheet with the pharmacy's name, logo and inventory, grouped by category, with Add buttons and a Consult button. Closed pharmacies can be browsed but not ordered from. Switching pharmacy with items in the cart asks first, then clears the cart.
+- Areas: `HS.AREAS` in `hs-core.js` lists the common areas of 11 states. Any area a partner registers is added automatically, so the lists grow as pharmacies join. All 36 states and the FCT can be selected.
+- Partners: the application form now asks for State and Community or area, and the listing carries both. Partners published before this update appear again the next time they open their dashboard.
+- Logos: a listing shows `logo` (an image URL) when it has one, otherwise a coloured tile with the pharmacy's initials. Add a logo upload to the partner profile to use real logos.
+- Demo data: `hs-core.js` has 11 demo pharmacies across Lagos, FCT Abuja, Rivers and Oyo, each with its own stock and prices. Only HealthPlus (p1) has a live demo dashboard.
 
 ## Wallet, payouts and history
 - **Customers:** Wallet tab. Fund by card, bank transfer or USSD, pay for orders and bookings from the wallet at checkout, see every transaction (funding, payments, refunds) with receipts. A pharmacy declining an order refunds the customer to the wallet automatically.

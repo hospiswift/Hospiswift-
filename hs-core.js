@@ -76,10 +76,71 @@
   /* ===== orders and visits ===== */
   HS.addOrder = function (o) { var a = get("hs_orders", []); o.id = o.id || HS.newId("HS", a); a.unshift(o); put("hs_orders", a.slice(0, 300)); return o; };
   HS.orders = function (fn) { return get("hs_orders", []).filter(fn || function () { return true; }); };
-  HS.setOrder = function (id, patch) { var a = get("hs_orders", []), hit = null; a.forEach(function (o) { if (o.id === id) { for (var k in patch) o[k] = patch[k]; hit = o; } }); if (hit) put("hs_orders", a); return hit; };
+  HS.setOrder = function (id, patch) { var a = get("hs_orders", []), hit = null; a.forEach(function (o) { if (o.id === id) { for (var k in patch) o[k] = patch[k]; hit = o; } }); if (hit) { put("hs_orders", a); if (patch.st === "rejected" && hit.paid && hit.cust && HS.wallet) HS.wallet.refund(hit.cust, hit.total, "Refund · Order " + hit.id, "ord:" + hit.id); } return hit; };
   HS.addVisit = function (v) { var a = get("hs_visits", []); v.id = v.id || HS.newId(v.kind === "ticket" ? "TK" : v.kind === "reg" ? "RG" : "BK", a); a.unshift(v); put("hs_visits", a.slice(0, 300)); return v; };
   HS.visits = function (fn) { return get("hs_visits", []).filter(fn || function () { return true; }); };
   HS.setVisit = function (id, patch) { var a = get("hs_visits", []), hit = null; a.forEach(function (o) { if (o.id === id) { for (var k in patch) o[k] = patch[k]; hit = o; } }); if (hit) put("hs_visits", a); return hit; };
+
+  /* ===== wallet ledger =====
+     One ledger for every wallet on this device: customers (owner = their phone or email) and partners
+     (owner = "partner:<id>"). Balances are always the sum of the ledger, never a stored number, so history and
+     balance can't drift apart. Money in (funding, refunds, earnings) is positive, money out (payments, payouts)
+     is negative. Every write that can be retried carries a ref, so the same order is never credited or refunded twice.
+     DEMO ONLY: the ledger lives in localStorage and no real money moves. In production the ledger, the balances
+     and the payouts must live on your server with a licensed wallet or virtual-account provider (see README). */
+  var WC = HS.config.wallet = { minFund: 500, maxFund: 200000, maxBalance: 500000, minPayout: 1000, payoutSeconds: 6 };
+  var W = HS.wallet = {};
+  function wAll() { return get("hs_wtx", []); }
+  function wSave(a) { put("hs_wtx", a.slice(0, 3000)); }
+  function wId() { return "TX" + Date.now().toString(36).toUpperCase().slice(-5) + Math.floor(10 + Math.random() * 90); }
+  function wSum(a, owner) { var n = 0; a.forEach(function (x) { if (x.owner === owner && x.st !== "failed") n += x.amt; }); return n; }
+  function wSettle(a) {   /* demo: a payout turns from "processing" to "paid" after a few seconds */
+    var now = Date.now(), ch = false, ttl = (WC.payoutSeconds || 6) * 1000;
+    a.forEach(function (x) { if (x.type === "payout" && x.st === "processing" && now - x.t > ttl) { x.st = "paid"; ch = true; } });
+    if (ch) wSave(a); return a;
+  }
+  W.add = function (owner, o) {
+    var a = wAll();
+    if (o.ref && a.some(function (x) { return x.owner === owner && x.type === o.type && x.ref === o.ref; })) return null;   /* already recorded */
+    var tx = { id: wId(), owner: owner, type: o.type, amt: Math.round(o.amt), title: o.title || "", ref: o.ref || "", method: o.method || "", st: o.st || "ok", t: o.t || Date.now(), meta: o.meta || null };
+    a.unshift(tx); wSave(a); return tx;
+  };
+  W.clear = function (owner) { wSave(wAll().filter(function (x) { return x.owner !== owner; })); };   /* demo reset */
+  W.balance = function (owner) { return wSum(wSettle(wAll()), owner); };
+  W.txs = function (owner, types) {
+    return wSettle(wAll()).filter(function (x) { return x.owner === owner && (!types || types.indexOf(x.type) > -1); }).sort(function (a, b) { return b.t - a.t; });
+  };
+  W.checkFund = function (owner, amount) {
+    amount = Math.round(amount);
+    if (!(amount >= WC.minFund)) return "The minimum is " + HS.naira(WC.minFund) + ".";
+    if (amount > WC.maxFund) return "The most you can add at once is " + HS.naira(WC.maxFund) + ".";
+    if (W.balance(owner) + amount > WC.maxBalance) return "Your wallet can hold up to " + HS.naira(WC.maxBalance) + ".";
+    return "";
+  };
+  W.fund = function (owner, amount, pay) { return W.add(owner, { type: "fund", amt: amount, title: "Wallet funding", method: pay.method, ref: pay.ref }); };
+  W.spend = function (owner, amount, title, ref) { if (W.balance(owner) < amount) return null; return W.add(owner, { type: "pay", amt: -amount, title: title, method: "wallet", ref: ref }); };
+  W.refund = function (owner, amount, title, ref) { return W.add(owner, { type: "refund", amt: amount, title: title, ref: ref }); };
+  W.earn = function (owner, o) { return W.add(owner, { type: "earn", amt: o.amount, title: o.title, ref: o.ref, t: o.t }); };
+  W.payout = function (owner, amount, dest) {
+    amount = Math.round(amount);
+    if (!(amount >= WC.minPayout)) return { error: "The minimum payout is " + HS.naira(WC.minPayout) + "." };
+    if (amount > W.balance(owner)) return { error: "That is more than your available balance." };
+    var last4 = String(dest.acct || "").slice(-4);
+    return { tx: W.add(owner, { type: "payout", amt: -amount, st: "processing", method: "bank", title: "Payout to " + dest.bank + " ····" + last4, ref: "PO" + Date.now().toString(36).toUpperCase().slice(-6), meta: { bank: dest.bank, last4: last4, name: dest.name || "" } }) };
+  };
+  W.stats = function (owner) {
+    var a = wSettle(wAll()).filter(function (x) { return x.owner === owner && x.st !== "failed"; }), r = { available: 0, lifetime: 0, paidOut: 0, processing: 0 };
+    a.forEach(function (x) { r.available += x.amt; if (x.type === "earn") r.lifetime += x.amt; if (x.type === "payout") { r.paidOut += -x.amt; if (x.st === "processing") r.processing += -x.amt; } });
+    return r;
+  };
+  HS.when = function (ts) {
+    var d = new Date(ts), n = new Date(), t = d.toLocaleTimeString("en-NG", { hour: "numeric", minute: "2-digit" }), day = new Date(n.getFullYear(), n.getMonth(), n.getDate()).getTime();
+    return ts >= day ? "Today, " + t : ts >= day - 864e5 ? "Yesterday, " + t : d.toLocaleDateString("en-NG", { day: "numeric", month: "short" }) + ", " + t;
+  };
+  HS.dayLabel = function (ts) {
+    var n = new Date(), day = new Date(n.getFullYear(), n.getMonth(), n.getDate()).getTime();
+    return ts >= day ? "Today" : ts >= day - 864e5 ? "Yesterday" : new Date(ts).toLocaleDateString("en-NG", { weekday: "short", day: "numeric", month: "short" });
+  };
 
   /* ===== customer profile: name, address, favourite pharmacy and hospital, hospital numbers ===== */
   HS.profile = function (phone) { return get("hs_prof", {})[phone] || null; };
@@ -131,7 +192,7 @@
         var sc = document.createElement("script"); sc.src = "https://js.paystack.co/v1/inline.js"; sc.onload = go; sc.onerror = function () { resolve(null); }; document.head.appendChild(sc); return;
       }
       pcss();
-      var st = { m: "card", busy: false, done: null, bank: "GTBank", acct: String(Math.floor(1e9 + Math.random() * 9e9)) };
+      var st = { m: (o.wallet && HS.wallet.balance(o.wallet) >= o.amount) ? "wallet" : "card", busy: false, done: null, bank: "GTBank", acct: String(Math.floor(1e9 + Math.random() * 9e9)) };
       var bg = document.createElement("div"); bg.className = "hsp-bg";
       bg.innerHTML = '<div class="hsp" role="dialog" aria-modal="true" aria-label="Payment"><div class="hsp-top"><b>Hosirx Pay</b><button class="hsp-x" data-x aria-label="Close payment">✕</button></div>' +
         '<div class="hsp-amt">' + HS.naira(o.amount) + '<span>' + HS.esc(o.title || "Payment") + '</span></div><div id="hspTabs"></div><div id="hspBody"></div><p class="hsp-note">Demo checkout. No money moves. Never enter a real card here.</p></div>';
@@ -145,10 +206,13 @@
       function succeed(method) { st.busy = false; st.done = { ref: ref, method: method, amount: o.amount, at: Date.now() }; draw(); }
       function busy(btn, msg, ms, then) { st.busy = true; btn.disabled = true; btn.textContent = msg; setTimeout(then, ms); }
       function draw() {
-        $("#hspTabs").innerHTML = st.done ? "" : '<div class="hsp-tabs" role="tablist">' + [["card", "Card"], ["bank", "Bank transfer"], ["ussd", "USSD"]].map(function (t) { return '<button role="tab" aria-selected="' + (st.m === t[0]) + '" class="' + (st.m === t[0] ? "on" : "") + '" data-m="' + t[0] + '">' + t[1] + '</button>'; }).join("") + '</div>';
+        $("#hspTabs").innerHTML = st.done ? "" : '<div class="hsp-tabs" role="tablist" style="grid-template-columns:repeat(' + (o.wallet ? 4 : 3) + ',1fr)">' + (o.wallet ? [["wallet", "Wallet"], ["card", "Card"], ["bank", "Transfer"], ["ussd", "USSD"]] : [["card", "Card"], ["bank", "Bank transfer"], ["ussd", "USSD"]]).map(function (t) { return '<button role="tab" aria-selected="' + (st.m === t[0]) + '" class="' + (st.m === t[0] ? "on" : "") + '" data-m="' + t[0] + '">' + t[1] + '</button>'; }).join("") + '</div>';
         var h = "";
-        if (st.done) h = '<div class="hsp-ok" role="status"><i>✓</i><b style="font-size:20px">Payment successful</b><div class="hsp-hint" style="margin-top:6px">Reference ' + st.done.ref + ' · ' + ({ card: "Card", bank: "Bank transfer", ussd: "USSD" }[st.done.method] || st.done.method) + '</div></div><button class="hsp-go" data-cont>Continue</button>';
-        else if (st.m === "card") h = '<div class="hsp-f"><label for="hc-n">Card number</label><input id="hc-n" inputmode="numeric" autocomplete="off" maxlength="23" placeholder="0000 0000 0000 0000"></div>' +
+        if (st.done) h = '<div class="hsp-ok" role="status"><i>✓</i><b style="font-size:20px">Payment successful</b><div class="hsp-hint" style="margin-top:6px">Reference ' + st.done.ref + ' · ' + ({ wallet: "Wallet", card: "Card", bank: "Bank transfer", ussd: "USSD" }[st.done.method] || st.done.method) + '</div></div><button class="hsp-go" data-cont>Continue</button>';
+        else if (st.m === "wallet") {
+          var wb = HS.wallet.balance(o.wallet), wok = wb >= o.amount;
+          h = '<div class="hsp-box">Wallet balance<b>' + HS.naira(wb) + '</b>' + (wok ? 'After this payment: ' + HS.naira(wb - o.amount) : 'You need ' + HS.naira(o.amount - wb) + ' more. Add money from the Wallet tab, or choose another way to pay.') + '</div><div class="hsp-err" id="hspErr" role="alert" hidden></div><button class="hsp-go" data-wal' + (wok ? '' : ' disabled') + '>Pay ' + HS.naira(o.amount) + ' from wallet</button>';
+        } else if (st.m === "card") h = '<div class="hsp-f"><label for="hc-n">Card number</label><input id="hc-n" inputmode="numeric" autocomplete="off" maxlength="23" placeholder="0000 0000 0000 0000"></div>' +
           '<div class="hsp-r"><div class="hsp-f"><label for="hc-e">Expiry</label><input id="hc-e" inputmode="numeric" autocomplete="off" maxlength="5" placeholder="MM/YY"></div><div class="hsp-f"><label for="hc-c">CVV</label><input id="hc-c" type="password" inputmode="numeric" autocomplete="off" maxlength="4" placeholder="123"></div></div>' +
           '<div class="hsp-hint">Test card: 4084 0840 8408 4081 · any future date · CVV 408</div><div class="hsp-err" id="hspErr" role="alert" hidden></div><button class="hsp-go" data-card>Pay ' + HS.naira(o.amount) + '</button>';
         else if (st.m === "bank") h = '<div class="hsp-box">Transfer exactly ' + HS.naira(o.amount) + ' to<b>' + st.acct + '</b>Wema Bank · Hosirx Pay (demo account)<br>This account expires in 30 minutes.</div><button class="hsp-go" data-bank>I have sent the money</button>';
@@ -162,6 +226,10 @@
         if (b.hasAttribute("data-x") && !st.busy) return close();
         if (b.hasAttribute("data-cont")) return close();
         if (b.dataset.m && !st.busy) { st.m = b.dataset.m; return draw(); }
+        if (b.hasAttribute("data-wal")) return busy(b, "Paying from wallet…", 900, function () {
+          if (!HS.wallet.spend(o.wallet, o.amount, o.title || "Payment", ref)) { st.busy = false; draw(); return err("Your wallet balance is too low."); }
+          succeed("wallet");
+        });
         if (b.hasAttribute("data-bank")) return busy(b, "Confirming transfer…", 1800, function () { succeed("bank"); });
         if (b.hasAttribute("data-ussd")) return busy(b, "Confirming payment…", 1500, function () { succeed("ussd"); });
         if (b.hasAttribute("data-card")) {

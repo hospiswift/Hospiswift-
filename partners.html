@@ -99,6 +99,21 @@ h1,h2,h3{font-family:Sora,Figtree,sans-serif}
 .wm{font-family:Sora,sans-serif;font-weight:800;letter-spacing:-.03em}.wm b{color:#1FB339}.wm i{color:#1688FF;font-style:normal}
 .brand .pt{font-weight:600;font-size:15px;color:#C9CBD0;font-family:Figtree,sans-serif;margin-left:2px}
 .toast{top:auto!important;bottom:calc(92px + env(safe-area-inset-bottom,0px));transform:translateX(-50%) translateY(180px)!important}.toast.on{transform:translateX(-50%) translateY(0)!important}
+
+/* wallet */
+.wcard{background:linear-gradient(135deg,#25272B,#32353B);color:#fff;border-radius:20px;padding:20px;margin:0 0 12px;position:relative;overflow:hidden}
+.wcard:after{content:"";position:absolute;right:-36px;top:-36px;width:170px;height:170px;border-radius:50%;background:radial-gradient(circle,rgba(31,179,57,.4),transparent 70%)}
+.wcard>*{position:relative;z-index:1}
+.wl{font-size:13px;color:#C9CBD0;font-weight:600}.wb{font-family:Sora,sans-serif;font-size:36px;font-weight:800;letter-spacing:-.03em;margin:4px 0}.wsub{font-size:13px;color:#C9CBD0}
+.wact{margin-top:16px;display:flex}.wact .btn{background:#1FB339;color:#0B2A12;font-weight:800;flex:none;width:auto;padding:12px 22px;margin:0}.wact .btn:disabled{opacity:.5}
+.tx{display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:#fff;border:1.5px solid var(--line);border-radius:14px;padding:12px;margin-bottom:8px}
+.txi{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;font-weight:800;flex:none;font-size:17px}
+.txi.in{background:#E3F7E8;color:#128A28}.txi.out{background:#ECEDEF;color:#1B1D21}
+.tx b{display:block;font-size:15px}.tx small{color:var(--mute);font-size:12px}
+.txa{font-weight:800;white-space:nowrap}.txa.in{color:#128A28}
+.dayh{font-size:12px;font-weight:700;color:var(--mute);text-transform:uppercase;letter-spacing:.06em;margin:16px 2px 8px}
+.rcpt{display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid var(--line);font-size:14px}.rcpt span:first-child{color:var(--mute)}.rcpt span:last-child{font-weight:700;text-align:right;word-break:break-all}
+.f input,.f select{width:100%;padding:13px;border:1.5px solid var(--line);border-radius:12px;font:inherit;background:#fff;color:var(--ink)}
 </style>
 </head>
 <body>
@@ -306,7 +321,7 @@ function done(){
 }
 
 /* ---------- PARTNER DASHBOARD (approved partners) ---------- */
-var PK=DEMO?"hs_portal_demo_"+DEMO:"hs_portal",P=null,TB="",OF="new",SF="all",BF="up",SH=false,simT=null,simN=0,beatT=null,hooked=false;
+var PK=DEMO?"hs_portal_demo_"+DEMO:"hs_portal",P=null,TB="",OF="new",SF="all",BF="up",SH=false,simT=null,simN=0,beatT=null,hooked=false,WF="all";
 var TIMES=HS.TIMES;
 var CATS=["Pain & fever","Vitamins","Stomach","Allergy","Antibiotics","Chronic care","Malaria","Other"];
 var NAMES=["Bola K.","Sam O.","Hauwa M.","Kelechi U.","Yemi T.","Dami F.","Rita N."];
@@ -511,14 +526,48 @@ function vDocs(){
       (P.docs.length>1?'<button class="rm" data-a="ddel" data-i="'+i+'">Remove doctor</button>':'')+'</div>'
   }).join("")):empty("Add at least one doctor patients can book."));
 }
+
+var BANKS=["GTBank","Access Bank","UBA","Zenith Bank","First Bank","Wema Bank","Sterling Bank","Fidelity Bank","Opay","Kuda","Moniepoint"];
+function wOwner(){return "partner:"+pid()}
+function pendingAmt(){var n=0;if(S.type==="pharm")P.orders.forEach(function(o){if(["new","preparing","ready","out"].indexOf(o.st)>-1)n+=osub(o)});else P.bookings.forEach(function(b){if(b.st==="confirmed"||b.st==="inprogress")n+=b.fee||0});return n}
+function settle(){   /* credit each completed job once; refs make this safe to run any number of times */
+  var o=wOwner(),W=HS.wallet;
+  if(DEMO&&!W.txs(o).length){
+    W.add(o,{type:"earn",amt:P.carry+P.last,title:"Earnings brought forward",ref:"seed:open",t:Date.now()-4*864e5});
+    if(P.last)W.add(o,{type:"payout",amt:-P.last,st:"paid",method:"bank",title:"Weekly payout",ref:"seed:payout",t:Date.now()-3*864e5,meta:{bank:P.pay.bank||"GTBank",last4:String(P.pay.acct||"").slice(-4)}});
+  }
+  (P.orders||[]).forEach(function(x){if(x.st==="done")W.earn(o,{ref:"ord:"+x.id,amount:osub(x),title:"Order "+x.id+" delivered",t:x.t2||x.t})});
+  (P.consults||[]).forEach(function(c){if(c.st==="completed")W.earn(o,{ref:"con:"+c.id,amount:c.fee||0,title:"Consultation "+c.id,t:c.t2||c.t})});
+  (P.bookings||[]).forEach(function(b){if(b.st==="completed")W.earn(o,{ref:"bk:"+b.id,amount:b.fee||0,title:"Visit "+b.id,t:b.t})});
+}
+function bankFields(){
+  var a=P.pay||{};
+  return '<div class="f"><label for="bBank">Bank</label><select id="bBank">'+BANKS.map(function(b){return '<option'+(b===a.bank?" selected":"")+'>'+b+'</option>'}).join("")+'</select></div>'+
+    '<div class="f"><label for="bAcct">Account number (10 digits)</label><input id="bAcct" type="text" inputmode="numeric" maxlength="10" autocomplete="off" value="'+esc(a.acct||"")+'"></div>'+
+    '<div class="f"><label for="bName">Account name</label><input id="bName" type="text" autocomplete="off" value="'+esc(a.name||"")+'"></div>';
+}
+function readBank(){
+  var b={bank:$("#bBank").value,acct:($("#bAcct").value||"").replace(/\D/g,""),name:($("#bName").value||"").trim()};
+  if(!/^\d{10}$/.test(b.acct))b.error="Enter the 10-digit account number.";
+  else if(b.name.length<3)b.error="Enter the account name.";
+  return b;
+}
+function sErr(m){var e=$("#wErr");e.textContent=m;e.hidden=false}
 function vEarn(){
+  settle();
   var ph=S.type==="pharm",today=0,cnt=0;
   if(ph){P.orders.forEach(function(o){if(o.st==="done"){today+=osub(o);cnt++}});P.consults.forEach(function(c){if(c.st==="completed"){today+=c.fee;cnt++}})}
   else P.bookings.forEach(function(b){if(b.st==="completed"){today+=b.fee;cnt++}});
-  var a=P.pay.acct,keys=Object.keys(P.fees);
-  var h='<div class="grid2"><div class="stat"><span class="s">'+(ph?"Sales today":"Earned today")+'</span><b>'+naira(today)+'</b></div><div class="stat"><span class="s">'+(ph?"Completed today":"Visits completed")+'</span><b>'+cnt+'</b></div>'+
-    '<div class="stat"><span class="s">Pending payout</span><b>'+naira(today+P.carry)+'</b></div><div class="stat"><span class="s">Last payout</span><b>'+(P.last?naira(P.last):"—")+'</b></div></div>'+
-    '<div class="card" style="margin-top:12px"><div class="t">Payout account</div><div class="s" style="margin-top:4px">'+(a?esc(P.pay.bank)+" · ····"+esc(a.slice(-4))+"<br>"+esc(P.pay.name):"Not set")+'</div><div class="s" style="margin-top:6px">Paid out weekly.</div></div>'+
+  var a=P.pay.acct,keys=Object.keys(P.fees),wo=wOwner(),ws=HS.wallet.stats(wo),pend=pendingAmt(),last="";
+  var rows=HS.wallet.txs(wo,["earn","payout"]).filter(function(x){return WF==="all"||x.type===WF}).map(function(x){
+    var d=HS.dayLabel(x.t),hd=d!==last?'<div class="dayh">'+esc(d)+'</div>':"",inn=x.amt>0;last=d;
+    return hd+'<button class="tx" data-a="wtx" data-i="'+esc(x.id)+'"><span class="txi '+(inn?"in":"out")+'" aria-hidden="true">'+(inn?"↓":"↑")+'</span><span class="grow"><b>'+esc(x.title)+'</b><small>'+esc(HS.when(x.t))+(x.type==="payout"?" · "+(x.st==="processing"?"Processing":"Paid"):"")+'</small></span><span class="txa '+(inn?"in":"")+'">'+(inn?"+":"−")+naira(Math.abs(x.amt))+'</span></button>'}).join("");
+  var h='<div class="wcard"><div class="wl">Available balance</div><div class="wb">'+naira(ws.available)+'</div><div class="wsub">'+(pend?naira(pend)+' pending until '+(ph?"orders are delivered":"visits are completed"):"Earnings are credited when "+(ph?"an order is delivered or a consultation is completed":"a visit is completed")+".")+'</div><div class="wact"><button class="btn" data-a="wd"'+(ws.available<HS.config.wallet.minPayout?" disabled":"")+'>Withdraw</button></div></div>'+
+    '<div class="grid2"><div class="stat"><span class="s">'+(ph?"Sales today":"Earned today")+'</span><b>'+naira(today)+'</b></div><div class="stat"><span class="s">'+(ph?"Completed today":"Visits completed")+'</span><b>'+cnt+'</b></div>'+
+    '<div class="stat"><span class="s">Lifetime earnings</span><b>'+naira(ws.lifetime)+'</b></div><div class="stat"><span class="s">Paid out</span><b>'+naira(ws.paidOut)+'</b></div></div>'+
+    '<div class="card" style="margin-top:12px"><div class="row"><div class="grow"><div class="t">Payout account</div><div class="s" style="margin-top:4px">'+(a?esc(P.pay.bank)+" · ····"+esc(a.slice(-4))+"<br>"+esc(P.pay.name):"Not set. Add the bank account that receives your payouts.")+'</div></div><button class="btn out" style="flex:none;width:auto;margin:0;padding:9px 14px" data-a="bank">'+(a?"Change":"Add")+'</button></div></div>'+
+    '<div class="t" style="margin:16px 2px 8px">Transactions</div><div class="chips">'+[["all","All"],["earn","Earnings"],["payout","Payouts"]].map(function(c){return '<button class="chip'+(WF===c[0]?" on":"")+'" data-a="wf" data-i="'+c[0]+'">'+c[1]+'</button>'}).join("")+'</div><div style="margin-top:10px">'+(rows||empty("No transactions yet."))+'</div>'+
+    '<div class="note" style="margin:6px 0 14px">'+(ph?"You receive the full price of the items. Delivery and service fees are paid separately by the customer.":"You receive the full appointment fee.")+' Demo wallet: no real money moves.</div>'+
     '<div class="card"><div class="t">'+(ph?"Consultation fees":"Appointment fees")+'</div><div class="s" style="margin:4px 0 12px">You set the price for each appointment type. Patients pay it through the payment gateway before the booking or consultation is confirmed.</div>'+
     keys.map(function(k,i){return '<div class="f"><label for="fe'+i+'">'+esc(HS.label(k))+' (₦)</label><div class="r"><input id="fe'+i+'" type="text" inputmode="numeric" data-fk="'+esc(k)+'" value="'+P.fees[k]+'" autocomplete="off">'+(!ph&&keys.length>1?'<button class="rm" style="margin:0" data-a="fdel" data-i="'+i+'" aria-label="Remove '+esc(HS.label(k))+'">Remove</button>':'')+'</div></div>'}).join("")+
     (keys.length?'<button class="btn" data-a="fsave">Save fees</button>':empty("No fees set."));
@@ -586,6 +635,23 @@ function act(a,i){
   case "rdy":o=ord(i);o.rider=pick(RIDERS);setO(o,"ready","Rider "+o.rider+" is coming to collect");return;
   case "out":setO(ord(i),"out","Handed to rider");return;
   case "dlv":setO(ord(i),"done","Order delivered");return;
+  case "wf":WF=i;draw();return;
+  case "wclose":closeSh();return;
+  case "wtx":{var tx=HS.wallet.txs(wOwner()).filter(function(t){return t.id===i})[0];if(!tx)return;
+    var rr=function(k,v){return '<div class="rcpt"><span>'+k+'</span><span>'+v+'</span></div>'},pay=tx.type==="payout";
+    openSh('<h3 style="margin-bottom:8px">'+(pay?"Payout":"Earning")+'</h3><div class="wb" style="font-size:30px;margin:0 0 8px;color:var(--ink)">'+(tx.amt>0?"+":"−")+naira(Math.abs(tx.amt))+'</div><span class="tag">'+(tx.st==="processing"?"Processing":pay?"Paid":"Credited")+'</span><div style="margin-top:10px">'+rr("Description",esc(tx.title))+rr("Date",esc(HS.when(tx.t)))+(pay&&tx.meta?rr("Destination",esc(tx.meta.bank)+" ····"+esc(tx.meta.last4)):"")+rr("Reference",esc(tx.ref||tx.id))+rr("Transaction ID",esc(tx.id))+'</div><button class="btn" style="margin-top:14px" data-a="wclose">Done</button>');return}
+  case "wd":{var w=HS.wallet.stats(wOwner());
+    openSh('<h3 style="margin-bottom:12px">Withdraw earnings</h3><div class="card"><div class="s">Available</div><div class="t" style="font-size:22px">'+naira(w.available)+'</div></div><div class="f"><label for="wAmt">Amount (₦)</label><input id="wAmt" type="text" inputmode="numeric" autocomplete="off" value="'+w.available+'"></div>'+
+      (P.pay.acct?'<div class="card"><div class="s">Paying to</div><div class="t">'+esc(P.pay.bank)+' · ····'+esc(P.pay.acct.slice(-4))+'</div><div class="s">'+esc(P.pay.name)+'</div></div>':'<div class="s" style="margin-bottom:8px">Add the bank account that receives this payout.</div>'+bankFields())+
+      '<div id="wErr" role="alert" hidden style="color:var(--red);font-weight:600;font-size:13px;margin-bottom:8px"></div><button class="btn" data-a="wdgo">Withdraw</button><div class="note">Minimum '+naira(HS.config.wallet.minPayout)+'. Demo payout: no real money moves.</div>');return}
+  case "wdgo":{var amt=parseInt(($("#wAmt").value||"").replace(/\D/g,""),10)||0,dest={bank:P.pay.bank,acct:P.pay.acct,name:P.pay.name};
+    if(!dest.acct){dest=readBank();if(dest.error)return sErr(dest.error)}
+    var res=HS.wallet.payout(wOwner(),amt,dest);if(res.error)return sErr(res.error);
+    if(!P.pay.acct){P.pay={bank:dest.bank,acct:dest.acct,name:dest.name};pSave()}
+    closeSh();draw();toast("Payout of "+naira(amt)+" is processing");
+    setTimeout(function(){if(TB==="earn")draw()},(HS.config.wallet.payoutSeconds+1)*1000);return}
+  case "bank":openSh('<h3 style="margin-bottom:12px">Payout account</h3>'+bankFields()+'<div id="wErr" role="alert" hidden style="color:var(--red);font-weight:600;font-size:13px;margin-bottom:8px"></div><button class="btn" data-a="bsave">Save account</button><div class="note">Check the account number carefully. In production the account name is confirmed with your bank before the first payout.</div>');return;
+  case "bsave":{var bb=readBank();if(bb.error)return sErr(bb.error);P.pay={bank:bb.bank,acct:bb.acct,name:bb.name};pSave();closeSh();draw();toast("Payout account saved");return}
   case "stog":s=stkId(i);s.on=s.on?0:1;pSave();draw();return;
   case "sadd":stockSheet("");return;
   case "sedit":stockSheet(i);return;
@@ -635,7 +701,7 @@ function act(a,i){
   case "reset":
     try{localStorage.removeItem(PK)}catch(e){}
     var ff=HS.get("hs_fees",{});delete ff[pid()];HS.put("hs_fees",ff);var ss=HS.get("hs_stock",{});delete ss[pid()];HS.put("hs_stock",ss);
-    P=null;simN=0;OF="new";SF="all";BF="up";pLoad();pull();pPublish();TB=tabs()[0].id;draw();toast("Demo data reset");return;
+    HS.wallet.clear(wOwner());P=null;simN=0;OF="new";SF="all";BF="up";pLoad();pull();pPublish();TB=tabs()[0].id;draw();toast("Demo data reset");return;
   }
 }
 

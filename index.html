@@ -149,6 +149,27 @@ header:after{content:"";position:absolute;left:0;right:0;bottom:0;height:4px;bac
 .gbrand{color:var(--ink);font-size:28px;gap:10px}.gbrand .emb{width:56px;height:49px}
 .gate h1{font-family:Sora,Figtree,sans-serif}
 .toast{top:auto!important;bottom:calc(100px + env(safe-area-inset-bottom,0px));transform:translateX(-50%) translateY(180px)!important}.toast.on{transform:translateX(-50%) translateY(0)!important}
+
+/* wallet and vendor drawer */
+nav button{font-size:11px}
+.wcard{background:linear-gradient(135deg,#25272B,#32353B);color:#fff;border-radius:20px;padding:20px;margin:4px 0 14px;position:relative;overflow:hidden}
+.wcard:after{content:"";position:absolute;right:-36px;top:-36px;width:170px;height:170px;border-radius:50%;background:radial-gradient(circle,rgba(31,179,57,.4),transparent 70%)}
+.wcard>*{position:relative;z-index:1}
+.wl{font-size:13px;color:#C9CBD0;font-weight:600}.wb{font-family:Sora,sans-serif;font-size:36px;font-weight:800;letter-spacing:-.03em;margin:4px 0}.wsub{font-size:13px;color:#C9CBD0}
+.wact{margin-top:16px;display:flex;gap:10px}.wact .btn{background:#1FB339;color:#0B2A12;font-weight:800;flex:none;padding:12px 20px}
+.tx{display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:#fff;border:1.5px solid var(--line);border-radius:14px;padding:12px;margin-bottom:8px}
+.txi{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;font-weight:800;flex:none;font-size:17px}
+.txi.in{background:#E3F7E8;color:#128A28}.txi.out{background:#ECEDEF;color:#1B1D21}
+.tx b{display:block;font-size:15px}.tx small{color:var(--mute);font-size:12px}
+.txa{font-weight:800;white-space:nowrap}.txa.in{color:#128A28}
+.dayh{font-size:12px;font-weight:700;color:var(--mute);text-transform:uppercase;letter-spacing:.06em;margin:16px 2px 8px}
+.amts{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
+.vcard.off{opacity:.55}.vcard.cur{border-color:var(--green)}.vcard .btn{flex:none}
+.vtags{margin-top:6px;display:flex;gap:6px;flex-wrap:wrap}
+.chips.scroll{display:flex;gap:8px;overflow-x:auto;margin:10px 0 12px}
+#vq,#fAmt{width:100%;padding:13px;border:1.5px solid var(--line);border-radius:12px;font:inherit;background:#fff;color:var(--ink)}
+#vq:focus,#fAmt:focus{outline:2px solid var(--accent);outline-offset:1px}
+.rcpt{display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid var(--line);font-size:14px}.rcpt span:first-child{color:var(--mute)}.rcpt span:last-child{font-weight:700;text-align:right;word-break:break-all}
 </style>
 </head>
 <body>
@@ -172,14 +193,14 @@ header:after{content:"";position:absolute;left:0;right:0;bottom:0;height:4px;bac
       <div><b>Medicine in 30–60 min</b><p>Verified pharmacies near you. Rider brings it to your door.</p></div>
     </div>
     <div class="card row" id="favBar" style="margin-top:10px"></div>
+    <div id="shopBox">
     <h2>Have a prescription?</h2>
     <label class="upload"><input type="file" id="rxFile" accept="image/*,.pdf">📄 Upload prescription<div class="s" id="rxName" style="font-weight:500">A pharmacist will verify it before dispatch</div></label>
     <h2>Categories</h2>
     <div class="chips" id="cats"></div>
     <h2>Medicines</h2>
     <div id="drugs"></div>
-    <h2>Pharmacies near you</h2>
-    <div id="pharms"></div>
+    </div>
   </section>
 
   <section class="view" id="v-hosp">
@@ -201,6 +222,11 @@ header:after{content:"";position:absolute;left:0;right:0;bottom:0;height:4px;bac
     <div id="orders"></div>
   </section>
 
+  <section class="view" id="v-wallet">
+    <h2 style="margin-top:4px">Wallet</h2>
+    <div id="wallet"></div>
+  </section>
+
   <section class="view" id="v-acct">
     <h2 style="margin-top:4px">Account</h2>
     <div id="acct"></div>
@@ -215,6 +241,7 @@ header:after{content:"";position:absolute;left:0;right:0;bottom:0;height:4px;bac
   <button data-v="pharm" class="on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="9" width="18" height="6" rx="3" transform="rotate(-35 12 12)"/><path d="m9 9 6 6"/></svg>Pharmacy</button>
   <button data-v="hosp"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 21V5a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v16M2 21h20M12 8v6M9 11h6"/></svg>Hospitals</button>
   <button data-v="orders"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2h12v20l-3-2-3 2-3-2-3 2zM9 8h6M9 12h6"/></svg>Orders<span class="badge" id="obadge" hidden>0</span></button>
+  <button data-v="wallet"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7a2 2 0 0 1 2-2h13v4"/><path d="M3 7v11a2 2 0 0 0 2 2h14a1 1 0 0 0 1-1v-9a1 1 0 0 0-1-1H5a2 2 0 0 1-2-2z"/><circle cx="16.5" cy="14.5" r="1.2" fill="currentColor"/></svg>Wallet</button>
   <button data-v="acct"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>Account</button>
 </nav>
 
@@ -254,7 +281,7 @@ var VST={confirmed:["Confirmed","tag"],inprogress:["In progress","tag rx"],compl
 var DEMO_ACCOUNTS=true; /* set to false to remove the demo buttons */
 var PERSIST_LOGIN=false; /* true: stay signed in after the tab closes. false: each tab has its own login, so you can try the customer and a partner side by side */
 var STORE=PERSIST_LOGIN?localStorage:sessionStorage,SKEY="hosirx_session",SESS=null,PRO=null,G={role:"cus",step:0,id:"",code:""},FR={mode:null};
-var S={cat:"All",hf:"All",q:"",cart:{},pharm:null,rx:null};
+var S={cat:"All",hf:"All",q:"",cart:{},pharm:null,rx:null,vOK:false,vq:"",vs:"near",wf:"all"};
 try{SESS=JSON.parse(STORE.getItem(SKEY)||"null")}catch(e){}
 function saveSess(){try{if(SESS)STORE.setItem(SKEY,JSON.stringify(SESS));else STORE.removeItem(SKEY)}catch(e){}}
 function partnerApp(){return HS.get("hs_partner",null)}
@@ -282,10 +309,11 @@ function show(v){
   document.querySelectorAll("nav button").forEach(function(b){b.classList.toggle("on",b.dataset.v===v)});
   document.body.classList.toggle("hosp",v==="hosp");
   document.querySelector('meta[name="theme-color"]').content="#25272B";
-  $("#searchWrap").style.display=(v==="orders"||v==="acct")?"none":"flex";
+  $("#searchWrap").style.display=(v==="orders"||v==="acct"||v==="wallet")?"none":"flex";
   $("#q").placeholder=v==="hosp"?"Search hospitals or doctors":"Search drugs or pharmacies";
   $("#q").value="";S.q="";
-  if(v==="hosp")renderHosp();else if(v==="pharm")renderPharm();else if(v==="acct")renderAcct();else renderOrders();
+  if(v==="hosp")renderHosp();else if(v==="pharm")renderPharm();else if(v==="acct")renderAcct();else if(v==="wallet")renderWallet();else renderOrders();
+  if(v==="pharm"&&!S.vOK)openVendors();
   updateCartBar();window.scrollTo(0,0);
 }
 document.querySelectorAll("nav button").forEach(function(b){b.onclick=function(){show(b.dataset.v)}});
@@ -296,7 +324,13 @@ $("#q").oninput=function(e){S.q=e.target.value.toLowerCase();var on=document.que
 var PILL='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="9" width="18" height="6" rx="3" transform="rotate(-35 12 12)"/><path d="m9 9 6 6"/></svg>';
 function renderPharm(){
   var p=pharm(),st=stock().filter(function(d){return d.on!==0});
-  $("#favBar").innerHTML='<div class="grow"><div class="s">Ordering from</div><div class="t">'+esc(p.name)+(p.id===(PRO&&PRO.favP)?' <span class="tag">★ Favourite</span>':'')+'</div></div>'+(p.closed?'<span class="tag red">Closed now</span>':'<span class="s">'+p.km+' km · '+p.eta+' min</span>');
+  $("#shopBox").hidden=!S.vOK;
+  if(!S.vOK){
+    $("#favBar").innerHTML='<div class="grow"><div class="t">Choose your pharmacy</div><div class="s">Medicines, prices and delivery depend on the pharmacy you pick.</div></div><button class="btn sm" id="pickV">Choose</button>';
+    $("#pickV").onclick=openVendors;
+    return;
+  }
+  $("#favBar").innerHTML='<div class="grow"><div class="s">Ordering from</div><div class="t">'+esc(p.name)+(p.id===(PRO&&PRO.favP)?' <span class="tag">★ Favourite</span>':'')+'</div><div class="s">'+(p.closed?'<span class="tag red">Closed now</span> ':'')+p.km+' km · '+p.eta+' min · ★ '+esc(p.rating)+'</div></div><div style="display:grid;gap:6px"><button class="btn sm out" id="chV">Change</button><button class="btn sm out" id="conV">Consult</button></div>';
   var cats=["All"].concat(st.map(function(d){return d.c}).filter(function(c,i,a){return a.indexOf(c)===i}));
   $("#cats").innerHTML=cats.map(function(c){return '<button class="chip'+(c===S.cat?' on':'')+'" data-c="'+esc(c)+'">'+esc(c)+'</button>'}).join("");
   document.querySelectorAll("#cats .chip").forEach(function(b){b.onclick=function(){S.cat=b.dataset.c;renderPharm()}});
@@ -309,14 +343,40 @@ function renderPharm(){
   }).join(""):'<div class="empty">No medicine found. Try another name or upload your prescription.</div>';
   document.querySelectorAll("#drugs [data-p]").forEach(function(b){b.onclick=function(){S.cart[b.dataset.p]=(S.cart[b.dataset.p]||0)+1;renderPharm();updateCartBar()}});
   document.querySelectorAll("#drugs [data-m]").forEach(function(b){b.onclick=function(){var id=b.dataset.m;S.cart[id]--;if(S.cart[id]<=0)delete S.cart[id];renderPharm();updateCartBar()}});
-  var ps=HS.listings("pharm").filter(function(x){return !S.q||x.name.toLowerCase().indexOf(S.q)>-1}).sort(function(a,b){return (b.id===(PRO&&PRO.favP))-(a.id===(PRO&&PRO.favP))||byKm(a,b)});
-  $("#pharms").innerHTML=ps.map(function(x){
-    return '<div class="card row" style="'+(x.id===S.pharm?'border-color:var(--green)':'')+'"><div class="ico"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 3h4v7h7v4h-7v7h-4v-7H3v-4h7z"/></svg></div>'+
-    '<div class="grow"><div class="t">'+esc(x.name)+'</div><div class="s">'+x.km+' km · '+x.eta+' min · ★ '+esc(x.rating)+'</div><div class="s">Open: '+esc(x.open)+'</div><div style="margin-top:4px">'+(x.id===(PRO&&PRO.favP)?'<span class="tag">★ Favourite</span> ':'')+(x.closed?'<span class="tag red">Closed now</span>':'')+'</div></div>'+
-    '<div style="display:grid;gap:6px"><button class="btn sm'+(x.id===S.pharm?'':' out')+'" data-ph="'+x.id+'">'+(x.id===S.pharm?'Selected':'Choose')+'</button><button class="btn sm out" data-pc="'+x.id+'">Consult</button></div></div>'
-  }).join("");
-  document.querySelectorAll("[data-ph]").forEach(function(b){b.onclick=function(){if(b.dataset.ph!==S.pharm&&cartCount()){S.cart={};toast("Cart cleared. Prices and stock differ by pharmacy")}else toast(HS.listing(b.dataset.ph).name+" selected");S.pharm=b.dataset.ph;S.cat="All";renderPharm();updateCartBar()}});
-  document.querySelectorAll("[data-pc]").forEach(function(b){b.onclick=function(){openBook("pharm",b.dataset.pc)}});
+  $("#chV").onclick=openVendors;
+  $("#conV").onclick=function(){openBook("pharm",S.pharm)};
+}
+
+/* ---------- VENDOR DRAWER ---------- */
+function vfee(x){return 500+Math.round(x.km*150)}
+function lastPharm(){var o=HS.orders(function(o){return o.cust===SESS.id})[0];return o?o.pid:null}
+function vendorList(){
+  var q=(S.vq||"").trim().toLowerCase(),fav=PRO&&PRO.favP,last=lastPharm();
+  var all=HS.listings("pharm"),open=all.filter(function(x){return !x.closed}).sort(byKm),nearest=open[0]&&open[0].id;
+  var by={near:byKm,fast:function(a,b){return a.eta-b.eta||byKm(a,b)},top:function(a,b){return b.rating-a.rating||byKm(a,b)}}[S.vs]||byKm;
+  var l=all.filter(function(x){return !q||x.name.toLowerCase().indexOf(q)>-1}).sort(function(a,b){return (a.closed?1:0)-(b.closed?1:0)||by(a,b)});
+  $("#vlist").innerHTML=l.length?l.map(function(x){
+    var cur=S.vOK&&x.id===S.pharm,tags=(x.id===nearest?'<span class="tag">Nearest</span>':'')+(x.id===fav?'<span class="tag">★ Favourite</span>':'')+(x.id===last?'<span class="tag">Ordered before</span>':'')+(x.open==="24 hrs"?'<span class="tag">24 hrs</span>':'')+(x.closed?'<span class="tag red">Closed now</span>':'');
+    return '<div class="card vcard'+(x.closed?' off':'')+(cur?' cur':'')+'"><div class="row"><div class="ico"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 3h4v7h7v4h-7v7h-4v-7H3v-4h7z"/></svg></div><div class="grow"><div class="t">'+esc(x.name)+'</div><div class="s">★ '+esc(x.rating)+' · '+x.km+' km · about '+x.eta+' min</div><div class="s">'+(x.closed?'Closed now':'Open '+esc(x.open))+' · Delivery '+naira(vfee(x))+'</div><div class="vtags">'+tags+'</div></div><button class="btn sm'+(cur?' out':'')+'" data-vp="'+esc(x.id)+'"'+(x.closed?' disabled':'')+'>'+(cur?'Selected':x.closed?'Closed':'Select')+'</button></div></div>';
+  }).join(""):'<div class="empty">No pharmacy matches “'+esc(S.vq)+'”.</div>';
+  document.querySelectorAll("[data-vp]").forEach(function(b){b.onclick=function(){pickVendor(b.dataset.vp)}});
+}
+function vendorSort(){
+  $("#vsort").innerHTML=[["near","Nearest"],["fast","Fastest"],["top","Top rated"]].map(function(t){return '<button class="chip'+(S.vs===t[0]?' on':'')+'" data-vs="'+t[0]+'">'+t[1]+'</button>'}).join("");
+  document.querySelectorAll("[data-vs]").forEach(function(b){b.onclick=function(){S.vs=b.dataset.vs;vendorSort();vendorList()}});
+}
+function openVendors(){
+  openSheet('<h3>Choose a pharmacy</h3><div class="s" style="margin-bottom:10px">Pharmacies that can deliver to '+esc(PRO.addr)+'. Pick one to see its medicines and prices.</div><div class="gf"><input id="vq" type="search" placeholder="Search pharmacies" value="'+esc(S.vq)+'" autocomplete="off" aria-label="Search pharmacies"></div><div class="chips scroll" id="vsort"></div><div id="vlist"></div>');
+  $("#vq").oninput=function(e){S.vq=e.target.value;vendorList()};
+  vendorSort();vendorList();
+}
+function pickVendor(id){
+  if(S.vOK&&id===S.pharm){closeSheet();return}
+  var go=function(){S.pharm=id;S.vOK=true;S.cat="All";S.cart={};S.vq="";closeSheet();renderPharm();updateCartBar();toast("Ordering from "+HS.listing(id).name)};
+  if(S.vOK&&cartCount()){
+    openSheet('<h3>Switch pharmacy?</h3><div class="s" style="margin-bottom:14px">Your cart has '+cartCount()+' item'+(cartCount()>1?'s':'')+' from '+esc(pharm().name)+'. Prices and stock differ between pharmacies, so switching clears the cart.</div><div class="ctl"><button class="btn out" id="vNo">Keep cart</button><button class="btn" id="vYes">Switch</button></div>');
+    $("#vNo").onclick=closeSheet;$("#vYes").onclick=go;
+  }else go();
 }
 $("#rxFile").onchange=function(e){var f=e.target.files[0];if(f){S.rx=f.name;$("#rxName").textContent="✔ "+f.name+" attached";toast("Prescription attached")}};
 function updateCartBar(){
@@ -340,7 +400,7 @@ function openCart(){
     if(p.closed){toast(p.name+" is closed right now. Choose another pharmacy");return}
     var stNow=stock();var short=items.filter(function(i){var x=stNow.filter(function(s){return s.id===i.d.id})[0];return !x||x.q<i.n})[0];
     if(short){toast("Not enough "+short.d.n+" in stock now");return}
-    HS.pay({amount:tot,title:"Order from "+p.name,email:PRO.email}).then(function(r){if(r)placeOrder(p,items,sub,f,svc,tot,r)});
+    HS.pay({wallet:SESS.id,amount:tot,title:"Order from "+p.name,email:PRO.email}).then(function(r){if(r)placeOrder(p,items,sub,f,svc,tot,r)});
   };
 }
 function placeOrder(p,items,sub,f,svc,tot,paid){
@@ -409,7 +469,7 @@ function openBook(kind,id){
     $("#go").onclick=function(){
       var amount=HS.fees(e.id)[st.mode];   /* re-read: the partner may have changed the fee */
       if(amount!==fees[st.mode]){toast("The fee changed to "+naira(amount)+". Check and pay again");fees=HS.fees(e.id);draw();return}
-      HS.pay({amount:amount,title:HS.label(st.mode)+" · "+e.name,email:PRO.email}).then(function(r){
+      HS.pay({wallet:SESS.id,amount:amount,title:HS.label(st.mode)+" · "+e.name,email:PRO.email}).then(function(r){
         if(!r)return;
         var v=HS.addVisit({kind:"booking",pid:e.id,cust:SESS.id,pat:PRO.name,phone:SESS.id,doc:st.doc,mode:st.mode,slot:st.slot,fee:amount,st:"confirmed",paid:r,src:"app",t:Date.now(),hn:(PRO.hn||{})[e.id]||""});
         closeSheet();toast("Paid. "+(st.slot==="Now"?"Your room is ready":"Booked for "+st.slot));show("orders");
@@ -436,7 +496,7 @@ function renderOrders(){
       (live&&open?'<button class="btn full" style="margin-top:10px" data-room="'+esc(v.id)+'">Join consultation room</button>':open?'<div class="s" style="margin-top:8px">Show this booking ID at reception.</div>':'')+'</div>';
     }
     var o=x.o,i=OSEQ.indexOf(o.st),done=o.st==="done";
-    if(o.st==="rejected")return '<div class="card"><div class="row"><div class="grow"><div class="t">Order '+esc(o.id)+'</div><div class="s">'+esc(o.ph)+'</div></div><span class="tag red">Declined</span></div><div class="s" style="margin-top:8px">The pharmacy could not fill this order. Your payment of '+naira(o.total)+' will be refunded.</div></div>';
+    if(o.st==="rejected")return '<div class="card"><div class="row"><div class="grow"><div class="t">Order '+esc(o.id)+'</div><div class="s">'+esc(o.ph)+'</div></div><span class="tag red">Declined</span></div><div class="s" style="margin-top:8px">The pharmacy could not fill this order. Your payment of '+naira(o.total)+' has been refunded to your wallet.</div></div>';
     return '<div class="card"><div class="row"><div class="grow"><div class="t">Order '+esc(o.id)+'</div><div class="s">'+esc(o.ph)+'</div></div><b>'+naira(o.total)+'</b></div>'+
     '<div class="s" style="margin-top:6px">'+o.items.map(function(it){return it.q+"× "+esc(it.n)}).join(", ")+'</div>'+
     '<ul class="steps">'+STAGES.map(function(s,k){return '<li class="'+(k<i?'done':k===i?(done?'done':'now'):'')+'">'+s+(k===2&&i>=2&&o.rider?' – '+esc(o.rider):'')+'</li>'}).join("")+'</ul>'+
@@ -469,6 +529,42 @@ function favSelects(p){
   var ph=HS.listings("pharm").sort(byKm),ho=HS.listings("hosp").sort(byKm);
   return '<div class="gf"><label for="fP">Favourite pharmacy</label><select id="fP">'+ph.map(function(x){return '<option value="'+x.id+'"'+(x.id===(p&&p.favP)?' selected':'')+'>'+esc(x.name)+'</option>'}).join("")+'</select></div>'+
     '<div class="gf"><label for="fH">Favourite hospital</label><select id="fH">'+ho.map(function(x){return '<option value="'+x.id+'"'+(x.id===(p&&p.favH)?' selected':'')+'>'+esc(x.name)+'</option>'}).join("")+'</select></div>';
+}
+
+/* ---------- WALLET ---------- */
+var WT={fund:{l:"Wallet funding",i:"↓",c:"in"},pay:{l:"Payment",i:"↑",c:"out"},refund:{l:"Refund",i:"↩",c:"in"}};
+var METH={card:"Card",bank:"Bank transfer",ussd:"USSD",wallet:"Wallet"};
+function wbal(){return HS.wallet.balance(SESS.id)}
+function signed(x){return (x.amt>0?"+":"−")+naira(Math.abs(x.amt))}
+function renderWallet(){
+  var bal=wbal(),all=HS.wallet.txs(SESS.id),f=S.wf,list=all.filter(function(x){return f==="all"||x.type===f}),last="";
+  var chips=[["all","All"],["fund","Funding"],["pay","Payments"],["refund","Refunds"]].map(function(c){return '<button class="chip'+(f===c[0]?' on':'')+'" data-wf="'+c[0]+'">'+c[1]+'</button>'}).join("");
+  var rows=list.map(function(x){
+    var d=HS.dayLabel(x.t),h=d!==last?'<div class="dayh">'+esc(d)+'</div>':"",k=WT[x.type]||WT.pay;last=d;
+    return h+'<button class="tx" data-tx="'+esc(x.id)+'"><span class="txi '+k.c+'" aria-hidden="true">'+k.i+'</span><span class="grow"><b>'+esc(x.title)+'</b><small>'+esc(HS.when(x.t))+(x.method?' · '+esc(METH[x.method]||x.method):'')+'</small></span><span class="txa '+k.c+'">'+signed(x)+'</span></button>';
+  }).join("");
+  $("#wallet").innerHTML='<div class="wcard"><div class="wl">Wallet balance</div><div class="wb">'+naira(bal)+'</div><div class="wsub">Pay for medicine, consultations and bookings in one tap.</div><div class="wact"><button class="btn" id="wFund">+ Fund wallet</button></div></div>'+
+    '<h2>Transactions</h2><div class="chips scroll">'+chips+'</div>'+(rows||'<div class="empty">'+(all.length?'No transactions of this type yet.':'No transactions yet. Fund your wallet to get started.')+'</div>')+
+    '<div class="note">Demo wallet. No real money moves and balances stay on this device. Refunds for declined orders return here.</div>';
+  $("#wFund").onclick=openFund;
+  document.querySelectorAll("[data-wf]").forEach(function(b){b.onclick=function(){S.wf=b.dataset.wf;renderWallet()}});
+  document.querySelectorAll("[data-tx]").forEach(function(b){b.onclick=function(){openReceipt(b.dataset.tx)}});
+}
+function openFund(){
+  openSheet('<h3>Fund wallet</h3><div class="s">Current balance <b>'+naira(wbal())+'</b></div><div class="amts">'+[2000,5000,10000,20000].map(function(a){return '<button class="chip" data-fa="'+a+'">'+naira(a)+'</button>'}).join("")+'</div><div class="gf"><label for="fAmt">Amount (₦)</label><input id="fAmt" inputmode="numeric" placeholder="e.g. 5000" autocomplete="off"></div><div class="gmsg" id="fErr" role="alert" hidden></div><button class="btn full" id="fGo">Continue to payment</button><div class="note">Minimum '+naira(HS.config.wallet.minFund)+'. Pay by card, bank transfer or USSD.</div>');
+  document.querySelectorAll("[data-fa]").forEach(function(b){b.onclick=function(){$("#fAmt").value=b.dataset.fa;$("#fErr").hidden=true}});
+  $("#fGo").onclick=function(){
+    var amt=parseInt(($("#fAmt").value||"").replace(/\D/g,""),10)||0,e=amt?HS.wallet.checkFund(SESS.id,amt):"Enter an amount.",er=$("#fErr");
+    if(e){er.textContent=e;er.hidden=false;return}
+    er.hidden=true;
+    HS.pay({amount:amt,title:"Fund wallet",email:PRO.email}).then(function(r){if(!r)return;HS.wallet.fund(SESS.id,amt,r);closeSheet();renderWallet();toast(naira(amt)+" added to your wallet")});
+  };
+}
+function openReceipt(id){
+  var x=HS.wallet.txs(SESS.id).filter(function(t){return t.id===id})[0];if(!x)return;
+  var k=WT[x.type]||WT.pay,r=function(a,b){return '<div class="rcpt"><span>'+a+'</span><span>'+b+'</span></div>'};
+  openSheet('<h3>'+esc(k.l)+'</h3><div class="wb" style="font-size:30px;margin:0 0 8px;color:var(--ink)">'+signed(x)+'</div><span class="tag">Successful</span><div style="margin-top:10px">'+r("Description",esc(x.title))+r("Date",esc(HS.when(x.t)))+(x.method?r("Paid with",esc(METH[x.method]||x.method)):"")+r("Reference",esc(x.ref||x.id))+r("Transaction ID",esc(x.id))+'</div><button class="btn full" id="rcX" style="margin-top:14px">Done</button>');
+  $("#rcX").onclick=closeSheet;
 }
 function renderAcct(){
   $("#acct").innerHTML='<div class="card"><div class="t">'+(SESS.demo?"Demo customer account":"Your profile")+'</div><div class="s" style="margin-top:2px">'+esc(SESS.id)+'</div>'+
@@ -567,10 +663,11 @@ function enter(){
   if(!PRO){showGate("cus",2);return}
   $("#gate").hidden=true;closeFrame();
   if(!S.pharm||!HS.listing(S.pharm))S.pharm=PRO.favP;
+  S.vOK=false;S.vq="";
   show("pharm");renderOrdersBadge();
 }
 function signOut(){
-  SESS=null;PRO=null;saveSess();$("#acct").innerHTML="";S.cart={};S.pharm=null;S.rx=null;closeSheet();closeFrame();showGate("cus");toast("Signed out");
+  SESS=null;PRO=null;saveSess();$("#acct").innerHTML="";S.cart={};S.pharm=null;S.vOK=false;S.rx=null;closeSheet();closeFrame();showGate("cus");toast("Signed out");
 }
 enter();
 })();
